@@ -1,0 +1,27 @@
+<?php
+  $activeClass = "site-nav__link site-nav__link--active";
+  $inactiveClass = "site-nav__link";
+
+  // Zabezpieczenie: jeśli z jakiegoś powodu activeTab nie istnieje, domyślnie jest puste
+  $currentTab = $activeTab ?? '';
+?>
+
+<nav class="site-nav">
+  <div class="site-nav__brand-group">
+    <span class="site-nav__brand">Hipertrof.io</span>
+
+    <div class="site-nav__links">
+      <a class="<?= ($currentTab === 'dashboard') ? $activeClass : $inactiveClass ?>" href="/dashboard">Dashboard</a>
+      <a class="<?= ($currentTab === 'planer') ? $activeClass : $inactiveClass ?>" href="/planer">Planer</a>
+      <a class="<?= ($currentTab === 'session') ? $activeClass : $inactiveClass ?>" href="/session"><strong>Rozpocznij trening!</strong></a>
+      <a class="<?= ($currentTab === 'atlas') ? $activeClass : $inactiveClass ?>" href="/atlas">Atlas</a>
+      <a class="<?= ($currentTab === 'history') ? $activeClass : $inactiveClass ?>" href="/history">Historia</a>
+    </div>
+
+  </div>
+  <div class="site-nav__actions">
+    <button class="site-nav__profile-button" type="button" aria-label="Profil użytkownika">
+      <span class="material-symbols-outlined site-nav__profile-icon">account_circle</span>
+    </button>
+  </div>
+</nav>

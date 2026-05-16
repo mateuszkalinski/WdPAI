@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <?php include __DIR__ . '/partials/head.html'; ?>
+    <title>DASHBOARD</title>
+  </head>
+  <body class="app-body">
+    <?php include __DIR__ . '/partials/nav.html'; ?>
+
+<!-- Main Content Canvas -->
+<main class="page-shell page-shell--dashboard">
+<!-- Welcome Section -->
+<header class="page-header dashboard-header">
+<h1 class="page-header__title">Cześć, Bartku!</h1>
+<p class="page-header__lead">Twój postęp w tym tygodniu wygląda imponująco. Tak trzymaj.</p>
+</header>
+<!-- Bento Grid Layout -->
+<div class="dashboard-grid">
+<!-- Left Side: Key Stats -->
+<div class="dashboard-grid__main">
+<!-- Card 1: Total Workouts -->
+<div class="surface-card surface-card--large surface-card--interactive dashboard-stat">
+<div>
+<span class="section-eyebrow">Tygodniowa Aktywność</span>
+<h3 class="dashboard-stat__title">Łącznie Treningów</h3>
+</div>
+<div class="dashboard-stat__summary">
+<span class="dashboard-stat__value dashboard-stat__value--primary">12</span>
+<span class="metric-trend">
+<span class="material-symbols-outlined metric-trend__icon">trending_up</span>
+                            +20%
+                        </span>
+</div>
+</div>
+<!-- Card 2: Overall Volume Progress -->
+<div class="surface-card surface-card--large surface-card--interactive dashboard-volume">
+<span class="section-eyebrow">Objętość Treningowa</span>
+<h3 class="dashboard-volume__title">Postęp Objętości</h3>
+<div class="dashboard-volume__body">
+<div class="dashboard-volume__row">
+<span class="dashboard-volume__value">42,500 <span class="dashboard-volume__unit">kg</span></span>
+<span class="dashboard-volume__goal">Cel: 50k</span>
+</div>
+<div class="progress-meter progress-meter--large progress-meter--soft">
+<div class="progress-meter__bar progress-meter__bar--success-gradient" style="width: 85%;"></div>
+</div>
+<p class="dashboard-volume__note">Brakuje Ci jeszcze 7,500 kg do osiągnięcia tygodniowego rekordu.</p>
+</div>
+</div>
+<!-- Card 3: Muscle Group Focus (Asymmetric Span) -->
+<div class="surface-card surface-card--large dashboard-muscle-card">
+<div class="dashboard-muscle-card__header">
+<div>
+<span class="section-eyebrow">Analiza Struktur</span>
+<h3 class="dashboard-muscle-card__title">Focus na Partie Mięśniowe</h3>
+</div>
+<button class="btn btn--subtle" type="button">Szczegóły</button>
+</div>
+<div class="muscle-focus">
+<div class="muscle-focus__chart">
+<!-- Simulated Radial Chart -->
+<div class="muscle-focus__ring"></div>
+<div class="muscle-focus__score">
+<span class="muscle-focus__percent">78%</span>
+<span class="muscle-focus__label">Wydajność</span>
+</div>
+</div>
+<div class="muscle-focus__legend">
+<div class="muscle-focus__legend-item">
+<div class="muscle-focus__legend-heading">
+<div class="muscle-focus__dot muscle-focus__dot--primary"></div>
+<span class="muscle-focus__name">Klatka Piersiowa</span>
+</div>
+<span class="muscle-focus__value">45%</span>
+</div>
+<div class="muscle-focus__legend-item">
+<div class="muscle-focus__legend-heading">
+<div class="muscle-focus__dot muscle-focus__dot--secondary"></div>
+<span class="muscle-focus__name">Plecy</span>
+</div>
+<span class="muscle-focus__value">32%</span>
+</div>
+<div class="muscle-focus__legend-item">
+<div class="muscle-focus__legend-heading">
+<div class="muscle-focus__dot muscle-focus__dot--tertiary"></div>
+<span class="muscle-focus__name">Nogi</span>
+</div>
+<span class="muscle-focus__value">18%</span>
+</div>
+<div class="muscle-focus__legend-item">
+<div class="muscle-focus__legend-heading">
+<div class="muscle-focus__dot muscle-focus__dot--muted"></div>
+<span class="muscle-focus__name">Inne</span>
+</div>
+<span class="muscle-focus__value">5%</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Side: Calendar & Secondary Actions -->
+<div class="dashboard-grid__sidebar">
+<!-- Calendar Widget -->
+<div class="surface-card surface-card--medium mini-calendar">
+<div class="mini-calendar__header">
+<h4 class="mini-calendar__title">Maj 2024</h4>
+<div class="mini-calendar__controls">
+<span class="material-symbols-outlined mini-calendar__control">chevron_left</span>
+<span class="material-symbols-outlined mini-calendar__control">chevron_right</span>
+</div>
+</div>
+<div class="mini-calendar__grid">
+<span class="mini-calendar__weekday">Pn</span>
+<span class="mini-calendar__weekday">Wt</span>
+<span class="mini-calendar__weekday">Śr</span>
+<span class="mini-calendar__weekday">Cz</span>
+<span class="mini-calendar__weekday">Pt</span>
+<span class="mini-calendar__weekday">So</span>
+<span class="mini-calendar__weekday">Nd</span>
+<span class="mini-calendar__day mini-calendar__day--muted">29</span>
+<span class="mini-calendar__day mini-calendar__day--muted">30</span>
+<span class="mini-calendar__day">1</span>
+<span class="mini-calendar__day">2</span>
+<span class="mini-calendar__day">3</span>
+<span class="mini-calendar__day mini-calendar__day--soft-active">4</span>
+<span class="mini-calendar__day">5</span>
+<span class="mini-calendar__day">6</span>
+<span class="mini-calendar__day mini-calendar__day--has-event">7</span>
+<span class="mini-calendar__day">8</span>
+<span class="mini-calendar__day">9</span>
+<span class="mini-calendar__day mini-calendar__day--active">10</span>
+<span class="mini-calendar__day">11</span>
+<span class="mini-calendar__day">12</span>
+<!-- ... simplified calendar -->
+</div>
+<div class="mini-calendar__agenda">
+<div class="mini-calendar__event">
+<div>
+<p class="mini-calendar__event-label">Dzisiaj</p>
+<p class="mini-calendar__event-title">Trening D: Nogi + Cardio</p>
+<p class="mini-calendar__event-meta">18:30 • Siłownia CityFit</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Motivation/Hero Image Card -->
+<div class="motivation-card">
+<img alt="Intensity" class="motivation-card__image" data-alt="dramatic low-key lighting of a professional athlete squatting in a high-end gym with focused expression and steam in the air" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDXUQ9z45pJdeUDByXu-F21-VrJGAcq4jFMdJ5fb9IyBLXuUUdbqv4pP77iVOJR4AloyuOU2VvonFHShE-oxKCX53KDZX8xWuZ025dkaEmsZTbZEXI1DttMuGcVjVkYERMtTLnLT0Pc7FbhNGm7luuadGiKu0K-CglcFQGPhv0v8qfLTo1m6md0xKHI8pR5_lX4gWJC3qlmp5b-j63v5-kE_aU0Vsi7KbX4wRy8TeP6QmHpkH937OFNt4R4ij1s1Dcs9P6vpYXpkwM"/>
+<div class="motivation-card__overlay">
+<span class="motivation-card__eyebrow">Wytrwałość</span>
+<h4 class="motivation-card__title">Dyscyplina buduje Mistrzów.</h4>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="site-footer site-footer--spaced">
+<div class="site-footer__inner">
+<div class="site-footer__meta-group">
+<span class="site-footer__meta">© 2026 Hipertrof.io. All rights reserved.</span>
+</div>
+<div class="site-footer__links">
+<a class="site-footer__link" href="#">Privacy</a>
+<a class="site-footer__link" href="#">Terms</a>
+<a class="site-footer__link" href="#">Support</a>
+</div>
+</div>
+</footer>
+<!-- Floating Action Button -->
+<button class="fab fab--large fab--gradient" type="button" aria-label="Dodaj">
+<span class="material-symbols-outlined fab__icon">add</span>
+</button>
+</body></html>

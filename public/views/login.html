@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <?php include __DIR__ . '/partials/head.html'; ?>
+
+  </head>
+  <body class="auth-page">
+    <form class="auth-form" method="POST" action="\login">
+      <h1 class="auth-form__title">LOGIN</h1>
+
+      <?php if(isset($messages)): ?>
+
+      <p class="auth-form__messages">
+        <?= $messages ?>
+      </p>
+
+      <?php endif; ?>
+      <input class="auth-form__field" name="email" type="email" placeholder="Twój email" />
+      <input class="auth-form__field" name="password" type="password" placeholder="Twoje hasło" />
+      <button class="btn btn--primary auth-form__submit" type="submit">LOGIN</button>
+
+      <a class="auth-form__link" href="/register">zarejestruj się!</a>
+    </form>
+  </body>
+</html>

@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <?php include __DIR__ . '/partials/head.html'; ?>
+    <title><?= $title; ?></title>
+  </head>
+  <body class="app-body">
+    <?php include __DIR__ . '/partials/nav.html'; ?>
+
+    <div class="home-layout">
+      <main class="home-layout__main">
+        <h1 class="home-layout__title">INDEX</h1>
+        <?php foreach($users as $key=>$value): ?>
+        <span class="home-layout__user-field"><?= $value["username"]; ?></span>
+        <span class="home-layout__user-field"><?= $value["full_name"]; ?></span>
+        <br />
+        <?php endforeach; ?>
+      </main>
+      <aside class="home-layout__aside">
+        <p>TODO later</p>
+      </aside>
+      <footer class="home-layout__footer">2026</footer>
+    </div>
+  </body>
+</html>

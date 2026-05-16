@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <?php include __DIR__ . '/partials/head.html'; ?>
+    <title>DASHBOARD</title>
+  </head>
+  <body class="app-body">
+    <?php include __DIR__ . '/partials/nav.html'; ?>
+    <main class="page-shell page-shell--session">
+<!-- Header Section -->
+<header class="session-header">
+<div>
+<span class="section-eyebrow section-eyebrow--primary session-header__eyebrow">Sesja w toku</span>
+<h1 class="session-header__title">Active Session: Push A</h1>
+</div>
+<div class="session-timer">
+<span class="material-symbols-outlined icon--filled session-timer__icon">timer</span>
+<span class="session-timer__value">00:42:15</span>
+</div>
+</header>
+<!-- Main Content Grid -->
+<div class="session-layout">
+<!-- Left Column: Active Exercise & Controls -->
+<div class="session-layout__main">
+<!-- Current Exercise Card -->
+<section class="surface-card surface-card--large surface-card--relative session-card">
+<div class="session-card__accent"></div>
+<div class="session-card__header">
+<div>
+<h2 class="session-card__title">Bench Press</h2>
+<p class="session-card__subtitle">Klatka piersiowa • Sztanga</p>
+</div>
+<button class="icon-button icon-button--ghost" type="button" aria-label="Informacje">
+<span class="material-symbols-outlined">info</span>
+</button>
+</div>
+<!-- Input Controls Bento Style -->
+<div class="set-controls">
+<!-- Weight Control -->
+<div class="set-control">
+<label class="set-control__label">Waga (kg)</label>
+<div class="stepper">
+<button class="stepper__button" type="button" aria-label="Zmniejsz wagę">
+<span class="material-symbols-outlined">remove</span>
+</button>
+<input class="stepper__field" type="number" value="80"/>
+<button class="stepper__button" type="button" aria-label="Zwiększ wagę">
+<span class="material-symbols-outlined">add</span>
+</button>
+</div>
+</div>
+<!-- Reps Control -->
+<div class="set-control">
+<label class="set-control__label">Powtórzenia</label>
+<div class="stepper">
+<button class="stepper__button" type="button" aria-label="Zmniejsz liczbę powtórzeń">
+<span class="material-symbols-outlined">remove</span>
+</button>
+<input class="stepper__field" type="number" value="10"/>
+<button class="stepper__button" type="button" aria-label="Zwiększ liczbę powtórzeń">
+<span class="material-symbols-outlined">add</span>
+</button>
+</div>
+</div>
+</div>
+<!-- CTA Button -->
+<button class="btn btn--success btn--full session-card__submit" type="button">
+<span class="material-symbols-outlined icon--filled">check_circle</span>
+                        Zakończ Serię
+                    </button>
+</section>
+<!-- Rest Timer Visualizer -->
+<div class="rest-timer">
+<div class="rest-timer__content">
+<div class="rest-timer__spinner"></div>
+<div>
+<p class="rest-timer__label">Odpoczynek</p>
+<p class="rest-timer__time">01:15 <span class="rest-timer__total">/ 01:30</span></p>
+</div>
+</div>
+<button class="rest-timer__skip" type="button">Pomiń</button>
+</div>
+</div>
+<!-- Right Column: Set History & Upcoming -->
+<div class="session-layout__aside">
+<!-- Completed Sets -->
+<div class="surface-card surface-card--large set-history">
+<h3 class="set-history__heading">Ukończone Serie</h3>
+<div class="set-history__list">
+<!-- Set Item -->
+<div class="set-history__item">
+<div class="set-history__item-main">
+<div class="set-history__status set-history__status--done">
+<span class="material-symbols-outlined icon--filled set-history__status-icon">done</span>
+</div>
+<div>
+<span class="set-history__name">Seria 1</span>
+<span class="set-history__meta">80 kg × 10</span>
+</div>
+</div>
+<span class="set-history__rpe">RPE 8</span>
+</div>
+<!-- Set Item -->
+<div class="set-history__item">
+<div class="set-history__item-main">
+<div class="set-history__status set-history__status--done">
+<span class="material-symbols-outlined icon--filled set-history__status-icon">done</span>
+</div>
+<div>
+<span class="set-history__name">Seria 2</span>
+<span class="set-history__meta">80 kg × 10</span>
+</div>
+</div>
+<span class="set-history__rpe">RPE 8.5</span>
+</div>
+<!-- Set Item (Active Placeholder) -->
+<div class="set-history__item set-history__item--muted">
+<div class="set-history__item-main">
+<div class="set-history__status">
+<span class="set-history__status-number">3</span>
+</div>
+<div>
+<span class="set-history__name">Seria 3</span>
+<span class="set-history__meta">Oczekiwanie...</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Next Exercise Preview -->
+<div class="next-exercise">
+<div class="next-exercise__icon">
+<span class="material-symbols-outlined">upcoming</span>
+</div>
+<div class="next-exercise__body">
+<p class="next-exercise__label">Następne ćwiczenie</p>
+<p class="next-exercise__title">Incline Dumbbell Press</p>
+</div>
+<span class="material-symbols-outlined next-exercise__arrow">chevron_right</span>
+</div>
+</div>
+</div>
+<!-- Finish Workout Sticky Footer -->
+<div class="sticky-action">
+<button class="btn btn--dark btn--full sticky-action__button" type="button">
+<span class="material-symbols-outlined">logout</span>
+                Zakończ Trening
+            </button>
+</div>
+</main>
+<!-- Footer navigation shell -->
+<footer class="site-footer site-footer--inline">
+<div class="site-footer__meta">© 2026 Hipertrof.io. All rights reserved.</div>
+<div class="site-footer__links">
+<a class="site-footer__link" href="#">Privacy</a>
+<a class="site-footer__link" href="#">Terms</a>
+<a class="site-footer__link" href="#">Support</a>
+</div>
+</footer>
+<!-- FAB for adding notes (Contextual to training) -->
+<button class="fab fab--notes" type="button" aria-label="Dodaj notatkę">
+<span class="material-symbols-outlined">edit_note</span>
+</button>
+</body></html>

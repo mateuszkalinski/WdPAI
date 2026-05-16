@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <?php include __DIR__ . '/partials/head.html'; ?>
+    <title>DASHBOARD</title>
+  </head>
+  <body class="app-body">
+    <?php include __DIR__ . '/partials/nav.html'; ?>
+
+<!-- Main Content Canvas -->
+<main class="page-shell page-shell--planner">
+<div class="planner-layout">
+<!-- Left Column: Searchable List -->
+<section class="planner-layout__library">
+<div class="surface-card surface-card--medium planner-library__search-card">
+<h2 class="section-eyebrow">Atlas Ćwiczeń</h2>
+<div class="search-box search-box--compact">
+<span class="material-symbols-outlined search-box__icon" data-icon="search">search</span>
+<input class="search-box__input" placeholder="Szukaj ćwiczenia..." type="text"/>
+</div>
+</div>
+<div class="exercise-list">
+<!-- Exercise Items -->
+<div class="exercise-list__item">
+<div class="exercise-list__icon">
+<span class="material-symbols-outlined exercise-list__icon-symbol" data-icon="fitness_center">fitness_center</span>
+</div>
+<div class="exercise-list__content">
+<p class="exercise-list__title">Wyciskanie Hantli</p>
+<span class="exercise-list__muscle">Klatka Piersiowa</span>
+</div>
+<span class="material-symbols-outlined exercise-list__drag" data-icon="drag_indicator">drag_indicator</span>
+</div>
+<div class="exercise-list__item exercise-list__item--featured">
+<div class="exercise-list__icon">
+<span class="material-symbols-outlined exercise-list__icon-symbol exercise-list__icon-symbol--secondary" data-icon="pulley">trolley_cable_car</span>
+</div>
+<div class="exercise-list__content">
+<p class="exercise-list__title">Podciąganie Nachwytem</p>
+<span class="exercise-list__muscle">Plecy</span>
+</div>
+<span class="material-symbols-outlined exercise-list__drag" data-icon="drag_indicator">drag_indicator</span>
+</div>
+<div class="exercise-list__item">
+<div class="exercise-list__icon">
+<span class="material-symbols-outlined exercise-list__icon-symbol" data-icon="exercise">exercise</span>
+</div>
+<div class="exercise-list__content">
+<p class="exercise-list__title">Wyciskanie Żołnierskie</p>
+<span class="exercise-list__muscle">Barki</span>
+</div>
+<span class="material-symbols-outlined exercise-list__drag" data-icon="drag_indicator">drag_indicator</span>
+</div>
+<div class="exercise-list__item">
+<div class="exercise-list__icon">
+<span class="material-symbols-outlined exercise-list__icon-symbol" data-icon="settings_accessibility">settings_accessibility</span>
+</div>
+<div class="exercise-list__content">
+<p class="exercise-list__title">Rozpiętki na Bramie</p>
+<span class="exercise-list__muscle">Klatka Piersiowa</span>
+</div>
+<span class="material-symbols-outlined exercise-list__drag" data-icon="drag_indicator">drag_indicator</span>
+</div>
+<div class="exercise-list__item">
+<div class="exercise-list__icon">
+<span class="material-symbols-outlined exercise-list__icon-symbol" data-icon="bolt">bolt</span>
+</div>
+<div class="exercise-list__content">
+<p class="exercise-list__title">Wznosy Bokiem</p>
+<span class="exercise-list__muscle">Barki</span>
+</div>
+<span class="material-symbols-outlined exercise-list__drag" data-icon="drag_indicator">drag_indicator</span>
+</div>
+</div>
+</section>
+<!-- Center Column: Drag-and-Drop Area -->
+<section class="planner-layout__board">
+<div class="surface-card surface-card--board plan-board">
+<div class="plan-board__header">
+<div>
+<h1 class="plan-board__title">Trening Poniedziałkowy</h1>
+<p class="plan-board__subtitle">Push / Upper Body Focus</p>
+</div>
+<div class="plan-board__actions">
+<button class="icon-button icon-button--soft icon-button--primary material-symbols-outlined" type="button" data-icon="save" aria-label="Zapisz">save</button>
+<button class="icon-button icon-button--primary material-symbols-outlined" type="button" data-icon="play_arrow" aria-label="Start">play_arrow</button>
+</div>
+</div>
+<!-- Slot Layout -->
+<div class="workout-slots">
+<!-- Filled Slot -->
+<div class="workout-slot">
+<div class="workout-slot__order">
+<button class="material-symbols-outlined workout-slot__order-button" type="button" data-icon="keyboard_arrow_up">keyboard_arrow_up</button>
+<span class="workout-slot__number">1</span>
+<button class="material-symbols-outlined workout-slot__order-button" type="button" data-icon="keyboard_arrow_down">keyboard_arrow_down</button>
+</div>
+<div class="workout-slot__content">
+<div class="workout-slot__header">
+<h3 class="workout-slot__title">Wyciskanie Sztangi Skos Dodatni</h3>
+<span class="badge badge--primary">Main Lift</span>
+</div>
+<div class="workout-slot__stats">
+<div class="stat-tile">
+<span class="stat-tile__label">Sets</span>
+<span class="stat-tile__value">3</span>
+</div>
+<div class="stat-tile">
+<span class="stat-tile__label">Reps</span>
+<span class="stat-tile__value">8-10</span>
+</div>
+<div class="stat-tile">
+<span class="stat-tile__label">RPE</span>
+<span class="stat-tile__value">8.5</span>
+</div>
+</div>
+</div>
+<button class="material-symbols-outlined workout-slot__delete" type="button" data-icon="delete" aria-label="Usuń">delete</button>
+</div>
+<!-- Empty Drop Target -->
+<div class="drop-zone">
+<span class="material-symbols-outlined drop-zone__icon" data-icon="add_circle">add_circle</span>
+<p class="drop-zone__text">Przeciągnij ćwiczenie tutaj</p>
+</div>
+<!-- Filled Slot -->
+<div class="workout-slot">
+<div class="workout-slot__order">
+<button class="material-symbols-outlined workout-slot__order-button" type="button" data-icon="keyboard_arrow_up">keyboard_arrow_up</button>
+<span class="workout-slot__number">2</span>
+<button class="material-symbols-outlined workout-slot__order-button" type="button" data-icon="keyboard_arrow_down">keyboard_arrow_down</button>
+</div>
+<div class="workout-slot__content">
+<div class="workout-slot__header">
+<h3 class="workout-slot__title">Podciąganie Sztangi w Opadzie</h3>
+<span class="badge badge--neutral">Hypertrophy</span>
+</div>
+<div class="workout-slot__stats">
+<div class="stat-tile">
+<span class="stat-tile__label">Sets</span>
+<span class="stat-tile__value">4</span>
+</div>
+<div class="stat-tile">
+<span class="stat-tile__label">Reps</span>
+<span class="stat-tile__value">12</span>
+</div>
+</div>
+</div>
+<button class="material-symbols-outlined workout-slot__delete" type="button" data-icon="delete" aria-label="Usuń">delete</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Right Column: Live Volume Tracker -->
+<section class="planner-layout__tracker">
+<div class="surface-card surface-card--medium surface-card--accent-secondary volume-tracker">
+<div class="panel-header">
+<h2 class="section-eyebrow">Live Volume Tracker</h2>
+<span class="material-symbols-outlined icon--filled volume-tracker__icon" data-icon="analytics">analytics</span>
+</div>
+<!-- Volume Bars -->
+<div class="volume-tracker__groups">
+<!-- Chest -->
+<div class="volume-tracker__group">
+<div class="volume-tracker__row">
+<span class="volume-tracker__label">Chest</span>
+<span class="volume-tracker__value">12 / 18 Sets</span>
+</div>
+<div class="progress-meter progress-meter--success">
+<div class="progress-meter__bar progress-meter__bar--success-gradient" style="width: 66%"></div>
+</div>
+</div>
+<!-- Back -->
+<div class="volume-tracker__group">
+<div class="volume-tracker__row">
+<span class="volume-tracker__label">Back</span>
+<span class="volume-tracker__value">8 / 18 Sets</span>
+</div>
+<div class="progress-meter progress-meter--success">
+<div class="progress-meter__bar progress-meter__bar--success-gradient" style="width: 44%"></div>
+</div>
+</div>
+<!-- Shoulders -->
+<div class="volume-tracker__group">
+<div class="volume-tracker__row">
+<span class="volume-tracker__label">Shoulders</span>
+<span class="volume-tracker__value">4 / 12 Sets</span>
+</div>
+<div class="progress-meter progress-meter--success">
+<div class="progress-meter__bar progress-meter__bar--success-gradient" style="width: 33%"></div>
+</div>
+</div>
+<!-- Biceps/Triceps Small -->
+<div class="volume-tracker__compact-grid">
+<div class="volume-tracker__compact">
+<span class="volume-tracker__compact-label">Biceps</span>
+<div class="progress-meter progress-meter--thin progress-meter--success">
+<div class="progress-meter__bar" style="width: 20%"></div>
+</div>
+</div>
+<div class="volume-tracker__compact">
+<span class="volume-tracker__compact-label">Triceps</span>
+<div class="progress-meter progress-meter--thin progress-meter--success">
+<div class="progress-meter__bar" style="width: 60%"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Secondary Insight Card -->
+<div class="surface-card surface-card--medium intensity-card">
+<h3 class="intensity-card__title">Est. Intensity</h3>
+<div class="intensity-card__row">
+<div class="intensity-card__score">8.4</div>
+<div class="intensity-scale">
+<div class="intensity-scale__fill" style="width: 84%"></div>
+<div class="intensity-scale__thumb" style="right: 16%"></div>
+</div>
+</div>
+<p class="intensity-card__note">Twoja obecna objętość jest optymalna dla adaptacji hipertroficznych w tym tygodniu.</p>
+</div>
+</section>
+</div>
+</main>
+<!-- Footer -->
+<footer class="site-footer site-footer--inline">
+<div class="site-footer__meta">
+            © 2026 Hipertrof.io. All rights reserved.
+        </div>
+<div class="site-footer__links">
+<a class="site-footer__link" href="#">Privacy</a>
+<a class="site-footer__link" href="#">Terms</a>
+<a class="site-footer__link" href="#">Support</a>
+</div>
+</footer>
+</body></html>

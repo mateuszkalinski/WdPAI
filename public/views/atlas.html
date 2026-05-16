@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <?php include __DIR__ . '/partials/head.html'; ?>
+    <title>DASHBOARD</title>
+  </head>
+  <body class="app-body">
+    <?php include __DIR__ . '/partials/nav.html'; ?>
+    <!-- Main Content Canvas -->
+<main class="page-shell page-shell--atlas">
+<!-- Header Section: Editorial Contrast -->
+<header class="page-header page-header--spacious">
+<h1 class="page-header__title page-header__title--tight">Atlas ćwiczeń</h1>
+<p class="page-header__lead page-header__lead--narrow">
+                Przeglądaj naszą bibliotekę ponad 500 ćwiczeń z dokładnymi diagramami anatomicznymi i instrukcjami wideo. Optymalizuj swoją hipertrofię dzięki poprawnej technice.
+            </p>
+</header>
+<!-- Search and Filter Bento Area -->
+<section class="atlas-toolbar">
+<!-- Search Container -->
+<div class="search-box search-box--atlas">
+<span class="material-symbols-outlined search-box__icon" data-icon="search">search</span>
+<input class="search-box__input" placeholder="Szukaj ćwiczenia (np. Wyciskanie, Przysiad...)" type="text"/>
+<kbd class="search-box__shortcut">⌘K</kbd>
+</div>
+<!-- Filter Chips -->
+<div class="filter-list">
+<button class="filter-chip filter-chip--active" type="button">Wszystkie</button>
+<button class="filter-chip" type="button">Klatka</button>
+<button class="filter-chip" type="button">Plecy</button>
+<button class="filter-chip" type="button">Nogi</button>
+<button class="filter-chip" type="button">Barki</button>
+<button class="filter-chip" type="button">Ramiona</button>
+</div>
+</section>
+<!-- Exercise Grid -->
+<div class="exercise-grid">
+<!-- Exercise Card 1 -->
+<div class="exercise-card">
+<div class="exercise-card__media">
+<img alt="Muscle diagram" class="exercise-card__image" data-alt="Minimalist anatomical diagram of chest muscles highlighted in electric blue on a clean grey background style" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCiqn03w6HiIRn347tkGV24CtNPc1dwp_W-fxYxQiBO3WQ3kZQSdaZrmrieddzxiqALy6VsChGhS58qwpDIoFlYG-qcfvg4VrqmqYfSG7P4J9GceQxQKyisMpMY13MdVNK5rruWCZf0phRae_lqIFeOb7xsFI5vBSH1LlpQBIzXhCndKA2rpX5PTLRHFFqQ-kuMom-EUuTPVt02BfXUxyd9t5mUplcArMaJVPGmvOCXKY0JFLySAT6kpV9idjlqU27qebxiumr6_VU"/>
+<div class="exercise-card__badge">KLATKA PIERSIOWA</div>
+</div>
+<div class="exercise-card__body">
+<h3 class="exercise-card__title">Wyciskanie na ławce poziomej</h3>
+<div class="exercise-card__meta">
+<span class="material-symbols-outlined exercise-card__meta-icon" data-icon="fitness_center">fitness_center</span>
+<span class="exercise-card__meta-text">Sztanga • Złożone</span>
+</div>
+<div class="progress-meter progress-meter--thin">
+<div class="progress-meter__bar" style="width: 85%"></div>
+</div>
+<div class="exercise-card__stats">
+<span class="exercise-card__stat-label">Intensywność</span>
+<span class="exercise-card__stat-value">Wysoka</span>
+</div>
+</div>
+</div>
+<!-- Exercise Card 2 -->
+<div class="exercise-card">
+<div class="exercise-card__media">
+<img alt="Muscle diagram" class="exercise-card__image" data-alt="Stylized medical illustration of human back muscles with latissimus dorsi highlighted in deep blue tint" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCX7lMxemeupQgoQOOacjLgemjoMInhzzOGQ9cg5q3Hy5Tb2vzL4ubKG9nekHZj3H_tJwIKd6ffrcICuavctqk2vZQ1j9xBkfIentzk3xAYylEmUzH-vd_6NDr5yQs1R1OrO79UczBN7tJfxPGwXTAa-ewsRWqXxzpW4nJBJG4F-oguti8CcaSQaaH0gyY78PYNnJq54k2ka3KqGYO62yrFJdTVT_mgyb3YNkh9o-riuIZjmNRddM6_8gxFrCGtPEPnWPkkmtHLA40"/>
+<div class="exercise-card__badge">PLECY</div>
+</div>
+<div class="exercise-card__body">
+<h3 class="exercise-card__title">Podciąganie na drążku</h3>
+<div class="exercise-card__meta">
+<span class="material-symbols-outlined exercise-card__meta-icon" data-icon="person">person</span>
+<span class="exercise-card__meta-text">Masa Ciała • Złożone</span>
+</div>
+<div class="progress-meter progress-meter--thin">
+<div class="progress-meter__bar" style="width: 70%"></div>
+</div>
+<div class="exercise-card__stats">
+<span class="exercise-card__stat-label">Trudność</span>
+<span class="exercise-card__stat-value">Średnia</span>
+</div>
+</div>
+</div>
+<!-- Exercise Card 3 -->
+<div class="exercise-card">
+<div class="exercise-card__media">
+<img alt="Muscle diagram" class="exercise-card__image" data-alt="Anatomical rendering of leg muscles quadriceps emphasized in vibrant blue glowing strokes against white" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAEYi1HewQ5AqmDkUG6cQEhilMs5qBZ9J8nHTaGBBS5w8NgyaodMMuQ4WWkyW2oergOuGyEq4BSRAtW8xcP76LzhrL99scBTqKDF4xgbrqzuH8FO1Zf1TZbFfjzOU7eOYwT8mRxajWgl7dV13yVLSuKRNkClxgjisH0gZ-StOSh24vOk0UHaqMC4KVgCFnYB-dlm6hY1RBLvxbiMwI7-vaBUYFvIdzmPfDARCzAjXFUf0lKP8Z0nS8UvBgIBnBaPRXjL7tIY2yXtWs"/>
+<div class="exercise-card__badge">NOGI</div>
+</div>
+<div class="exercise-card__body">
+<h3 class="exercise-card__title">Przysiad ze sztangą</h3>
+<div class="exercise-card__meta">
+<span class="material-symbols-outlined exercise-card__meta-icon" data-icon="fitness_center">fitness_center</span>
+<span class="exercise-card__meta-text">Sztanga • Złożone</span>
+</div>
+<div class="progress-meter progress-meter--thin">
+<div class="progress-meter__bar" style="width: 95%"></div>
+</div>
+<div class="exercise-card__stats">
+<span class="exercise-card__stat-label">Zaangażowanie CNS</span>
+<span class="exercise-card__stat-value">Ekstremalne</span>
+</div>
+</div>
+</div>
+<!-- Exercise Card 4 -->
+<div class="exercise-card">
+<div class="exercise-card__media">
+<img alt="Muscle diagram" class="exercise-card__image" data-alt="Abstract 3D model of human arm highlighting biceps and triceps with modern digital neon blue highlights" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB8F5SB7DEZqrTEcF97bm1WdaY_efdr94Hx91tjZtTmjxNZarNVYsVOabFAS3TUj29vWp2eG6Hl3BRlC-92EghzabpZGmyXYMP-H7QAxq29a0Yba_GltTp3MWNb741lu8SpNJYq8SAhLkJLa5P0VuwxvUhhFxGpoSgjrF8K2Ulp0S28o13hZxAUoHGovl_Jr6jkGdHdZEPIH5woxZxlZJuFUK4B3xdjCU3LJ8Zzl9MrQRxHX43_pPAadEkyrwyoftPa6gBRj1VWCK8"/>
+<div class="exercise-card__badge">RAMIONA</div>
+</div>
+<div class="exercise-card__body">
+<h3 class="exercise-card__title">Uginanie ramion z hantlami</h3>
+<div class="exercise-card__meta">
+<span class="material-symbols-outlined exercise-card__meta-icon" data-icon="exercise">exercise</span>
+<span class="exercise-card__meta-text">Hantle • Izolacja</span>
+</div>
+<div class="progress-meter progress-meter--thin">
+<div class="progress-meter__bar" style="width: 40%"></div>
+</div>
+<div class="exercise-card__stats">
+<span class="exercise-card__stat-label">Izolacja</span>
+<span class="exercise-card__stat-value">Wysoka</span>
+</div>
+</div>
+</div>
+<!-- Exercise Card 5 -->
+<div class="exercise-card">
+<div class="exercise-card__media">
+<img alt="Muscle diagram" class="exercise-card__image" data-alt="Technical illustration of shoulder deltoid muscles with blue color highlights and clean vector lines" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCCelcigP7bP1P6bWZvbJNZCFLndDasoaBKIPYDH77VWIbDV0sZILsB-zUxAn91sYBgPXLuSnrD5mSrARy2XvV9XIPtG-4uKALCDu5hTRWaLVPO4_UaXcyZp14p0wpUWIPgkRMkt8gFvnMLeOStakHTRUNYEemhdtckWtIGFH9_NDatkVVRpgdJmjCiz52vHmQ92C5BxjyVFImWJchV0axs4QW_AWQo2NhXbEfQsIPA41VKfb7s2yma35bxl8ZPyB-SqX0lAlEZaOM"/>
+<div class="exercise-card__badge">BARKI</div>
+</div>
+<div class="exercise-card__body">
+<h3 class="exercise-card__title">Wyciskanie żołnierskie</h3>
+<div class="exercise-card__meta">
+<span class="material-symbols-outlined exercise-card__meta-icon" data-icon="fitness_center">fitness_center</span>
+<span class="exercise-card__meta-text">Sztanga • Złożone</span>
+</div>
+<div class="progress-meter progress-meter--thin">
+<div class="progress-meter__bar" style="width: 75%"></div>
+</div>
+<div class="exercise-card__stats">
+<span class="exercise-card__stat-label">Stabilizacja</span>
+<span class="exercise-card__stat-value">Wymagana</span>
+</div>
+</div>
+</div>
+<!-- Exercise Card 6 (Bento-ish Highlight) -->
+<div class="exercise-card exercise-card--highlight">
+<div class="exercise-card__media exercise-card__media--highlight">
+<div class="exercise-card__media-pattern" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBtreUYUL_HNDeHbC2q73a3SzTnEZtMvCa3hERxstxKlrQLQkjfVHxCSons3baLp18oyKB-uw1piOj78yMungHFR2nWk8sUbNoySjYCqgvXuqTVq--VMJpsyYN_LLW-trBArK5OspzQ8Xi60I0pLQZfRc3NsP-_ood88M-VrsQsH9oK0673VkxwM84SumY5Z1cH2xsUlfUSuMrwuEdbbis_-IAue5Z3uxzsi7p8fk3mbOBA4CQTE5uAPXw7wNl4xqSoZGohVeLrd4g');"></div>
+<div class="exercise-card__feature">
+<span class="material-symbols-outlined exercise-card__feature-icon" data-icon="bolt">bolt</span>
+<p class="exercise-card__feature-label">Nowe ćwiczenie</p>
+<h3 class="exercise-card__feature-title">Dipsy na poręczach</h3>
+</div>
+<div class="exercise-card__badge exercise-card__badge--inverse">TRICEPS/KLATKA</div>
+</div>
+<div class="exercise-card__body">
+<p class="exercise-card__description">Najlepsze ćwiczenie wielostawowe na rozwój dołu klatki piersiowej oraz tricepsów.</p>
+<button class="btn btn--card-action" type="button">Zobacz detale</button>
+</div>
+</div>
+<!-- Exercise Card 7 -->
+<div class="exercise-card">
+<div class="exercise-card__media">
+<img alt="Muscle diagram" class="exercise-card__image" data-alt="Human anatomy study of the core and abdominal muscles with transverse abdominis glowing in blue light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCFfxMhO9qlEmZ281yHYvGNpakLLxXXSz21MmyY35skB64lnJ9fS61yF2HwatQYuJQYj5t7Ni0MeP_aYv9E8EzBeObjiG9SyA7FolC6MXW54mkglZAhsbPfzxpjKpV5sh7M_GoGDenrWGnmQjTn2U7C_C8rcDbzIb78iLUpxXBo95F-QEW0pqqqj0FmVz6tevd8gKWGGW87PRQt9G4bb7eGSXRgzc4B0TUcLoovVzLd2-VR49jTeYn-PsAa3TQYIF-ASaaQPX0GWn4"/>
+<div class="exercise-card__badge">CORE</div>
+</div>
+<div class="exercise-card__body">
+<h3 class="exercise-card__title">Dead Bug (Martwy robak)</h3>
+<div class="exercise-card__meta">
+<span class="material-symbols-outlined exercise-card__meta-icon" data-icon="accessibility_new">accessibility_new</span>
+<span class="exercise-card__meta-text">Masa Ciała • Aktywacja</span>
+</div>
+<div class="progress-meter progress-meter--thin">
+<div class="progress-meter__bar" style="width: 30%"></div>
+</div>
+<div class="exercise-card__stats">
+<span class="exercise-card__stat-label">Stopień aktywacji</span>
+<span class="exercise-card__stat-value">Wysoki</span>
+</div>
+</div>
+</div>
+<!-- Exercise Card 8 -->
+<div class="exercise-card">
+<div class="exercise-card__media">
+<img alt="Muscle diagram" class="exercise-card__image" data-alt="Anatomical chart showing hamstring and gluteal muscles with detailed muscle fibers in shades of blue" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBHhAdF4rp8hxQWwjtXUuRGGTJuuPSb_X_rJXmrHnvScyCiQqjnFLwpsWou64Ulaa2BerDJhQTWF6IJpY1jSlppX6oLswRaLoG4nJNGPYE3ZTH_KdCgaJxl71j4M_WZQFS2kw2iflYFe5FbNaBAUWs_uZOV1F4JCzKiD3Bp0E_z1T6avdHjN4UZMY_YSwSLDtG4f9m6XOLMjIio-arvwsuZ-pX4hp4mwt8nAfVEnipaGqsnzHgOCq9PeeMLHGWkA0Zrwqne0rDfkGE"/>
+<div class="exercise-card__badge">NOGI</div>
+</div>
+<div class="exercise-card__body">
+<h3 class="exercise-card__title">Martwy ciąg rumuński</h3>
+<div class="exercise-card__meta">
+<span class="material-symbols-outlined exercise-card__meta-icon" data-icon="fitness_center">fitness_center</span>
+<span class="exercise-card__meta-text">Sztanga • Złożone</span>
+</div>
+<div class="progress-meter progress-meter--thin">
+<div class="progress-meter__bar" style="width: 90%"></div>
+</div>
+<div class="exercise-card__stats">
+<span class="exercise-card__stat-label">Rozciągnięcie</span>
+<span class="exercise-card__stat-value">Maksymalne</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Load More Section -->
+<div class="load-more">
+<button class="btn btn--load-more" type="button">
+<span>Załaduj więcej ćwiczeń</span>
+<span class="material-symbols-outlined btn__icon-down" data-icon="expand_more">expand_more</span>
+</button>
+</div>
+</main>
+<!-- Footer Shell -->
+<footer class="site-footer site-footer--inline">
+<div class="site-footer__meta-group">
+<span class="site-footer__meta">© 2024 Hipertrof.io. All rights reserved.</span>
+</div>
+<div class="site-footer__links">
+<a class="site-footer__link" href="#">Privacy</a>
+<a class="site-footer__link" href="#">Terms</a>
+<a class="site-footer__link" href="#">Support</a>
+</div>
+</footer>
+<!-- FAB Overlay (Suppressed as per rules for Atlas view, but added for contextual UX if needed on Home) -->
+<!-- Suppressed -->
+</body></html>

@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <?php include __DIR__ . '/partials/head.html'; ?>
+    <title>DASHBOARD</title>
+  </head>
+  <body class="app-body">
+    <?php include __DIR__ . '/partials/nav.html'; ?>
+    <main class="page-shell page-shell--history">
+<!-- Header Section -->
+<header class="page-header">
+<h1 class="page-header__title">Historia &amp; Progres</h1>
+<p class="page-header__lead page-header__lead--narrow">Monitoruj swoje postępy, przeglądaj kalendarz treningowy i bij rekordy życiowe.</p>
+</header>
+<!-- Main Layout: Asymmetric Bento Grid -->
+<div class="history-layout">
+<!-- Left Column: Calendar View (8 cols) -->
+<div class="history-layout__main">
+<section class="surface-card surface-card--large calendar-panel">
+<div class="panel-header panel-header--wide">
+<h2 class="panel-header__title">Maj 2024</h2>
+<div class="panel-header__actions">
+<button class="icon-button icon-button--soft" type="button" aria-label="Poprzedni miesiąc">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<button class="icon-button icon-button--soft" type="button" aria-label="Następny miesiąc">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- Calendar Grid -->
+<div class="calendar-board">
+<!-- Days Header -->
+<div class="calendar-board__weekday">Pn</div>
+<div class="calendar-board__weekday">Wt</div>
+<div class="calendar-board__weekday">Śr</div>
+<div class="calendar-board__weekday">Cz</div>
+<div class="calendar-board__weekday">Pt</div>
+<div class="calendar-board__weekday">So</div>
+<div class="calendar-board__weekday">Nd</div>
+<!-- Previous month dates -->
+<div class="calendar-board__cell calendar-board__cell--muted">29</div>
+<div class="calendar-board__cell calendar-board__cell--muted">30</div>
+<!-- Current Month -->
+<div class="calendar-board__cell calendar-board__cell--interactive">
+<span class="calendar-board__date">1</span>
+</div>
+<div class="calendar-board__cell calendar-board__cell--interactive calendar-board__cell--has-workout">
+<div class="calendar-board__highlight"></div>
+<span class="calendar-board__date calendar-board__date--primary">2</span>
+<div class="calendar-board__dot"></div>
+</div>
+<div class="calendar-board__cell calendar-board__cell--interactive">
+<span class="calendar-board__date">3</span>
+</div>
+<div class="calendar-board__cell calendar-board__cell--interactive">
+<span class="calendar-board__date">4</span>
+</div>
+<div class="calendar-board__cell calendar-board__cell--interactive">
+<span class="calendar-board__date">5</span>
+</div>
+<!-- Week 2 -->
+<div class="calendar-board__cell calendar-board__cell--interactive calendar-board__cell--has-workout">
+<div class="calendar-board__highlight"></div>
+<span class="calendar-board__date calendar-board__date--primary">6</span>
+<div class="calendar-board__dot"></div>
+</div>
+<div class="calendar-board__cell calendar-board__cell--interactive">
+<span class="calendar-board__date">7</span>
+</div>
+<!-- Active Selected Date 8 -->
+<div class="calendar-board__cell calendar-board__cell--selected">
+<span class="calendar-board__date calendar-board__date--selected">8</span>
+</div>
+<div class="calendar-board__cell calendar-board__cell--interactive calendar-board__cell--has-workout">
+<div class="calendar-board__highlight calendar-board__highlight--outlined"></div>
+<span class="calendar-board__date calendar-board__date--primary">9</span>
+<div class="calendar-board__dot"></div>
+</div>
+<div class="calendar-board__cell calendar-board__cell--interactive">
+<span class="calendar-board__date">10</span>
+</div>
+<div class="calendar-board__cell calendar-board__cell--interactive">
+<span class="calendar-board__date">11</span>
+</div>
+<div class="calendar-board__cell calendar-board__cell--interactive">
+<span class="calendar-board__date">12</span>
+</div>
+<!-- Rest of the grid (simplified for visual) -->
+<div class="calendar-board__cell calendar-board__cell--quiet">13</div>
+<div class="calendar-board__cell calendar-board__cell--quiet">14</div>
+<div class="calendar-board__cell calendar-board__cell--quiet">15</div>
+<div class="calendar-board__cell calendar-board__cell--quiet">16</div>
+<div class="calendar-board__cell calendar-board__cell--quiet">17</div>
+<div class="calendar-board__cell calendar-board__cell--quiet">18</div>
+<div class="calendar-board__cell calendar-board__cell--quiet">19</div>
+<div class="calendar-board__cell calendar-board__cell--quiet">20</div>
+<div class="calendar-board__cell calendar-board__cell--quiet">21</div>
+<div class="calendar-board__cell calendar-board__cell--quiet">22</div>
+<div class="calendar-board__cell calendar-board__cell--quiet">23</div>
+<div class="calendar-board__cell calendar-board__cell--quiet">24</div>
+<div class="calendar-board__cell calendar-board__cell--quiet">25</div>
+<div class="calendar-board__cell calendar-board__cell--quiet">26</div>
+<div class="calendar-board__cell calendar-board__cell--quiet">27</div>
+<div class="calendar-board__cell calendar-board__cell--quiet">28</div>
+<div class="calendar-board__cell calendar-board__cell--quiet">29</div>
+<div class="calendar-board__cell calendar-board__cell--quiet">30</div>
+<div class="calendar-board__cell calendar-board__cell--quiet">31</div>
+</div>
+</section>
+<!-- Workout Summary Card (Opens on Tap) -->
+<section class="surface-card surface-card--large surface-card--outlined-primary workout-summary">
+<div class="workout-summary__header">
+<div>
+<span class="section-eyebrow section-eyebrow--primary">Szczegóły treningu • 8 Maj</span>
+<h3 class="workout-summary__title">Workout: Legs B</h3>
+</div>
+<div class="workout-summary__stats">
+<div class="stat-chip">
+<span class="stat-chip__label">Czas trwania</span>
+<span class="stat-chip__value">45 min</span>
+</div>
+<div class="stat-chip stat-chip--primary">
+<span class="stat-chip__label">Objętość</span>
+<span class="stat-chip__value">5000kg</span>
+</div>
+</div>
+</div>
+<div class="workout-summary__exercises">
+<div class="exercise-mini-card">
+<span class="material-symbols-outlined exercise-mini-card__icon">fitness_center</span>
+<p class="exercise-mini-card__title">Przysiad ze sztangą</p>
+<p class="exercise-mini-card__meta">4 serie x 8 powt.</p>
+</div>
+<div class="exercise-mini-card">
+<span class="material-symbols-outlined exercise-mini-card__icon">settings_accessibility</span>
+<p class="exercise-mini-card__title">Wypychanie na suwnicy</p>
+<p class="exercise-mini-card__meta">3 serie x 12 powt.</p>
+</div>
+<div class="exercise-mini-card">
+<span class="material-symbols-outlined exercise-mini-card__icon">bolt</span>
+<p class="exercise-mini-card__title">Uginanie nóg leżąc</p>
+<p class="exercise-mini-card__meta">3 serie x 15 powt.</p>
+</div>
+</div>
+</section>
+</div>
+<!-- Right Column: Personal Records (4 cols) -->
+<aside class="history-layout__aside">
+<div class="surface-card surface-card--medium records-card">
+<div class="panel-header">
+<h2 class="panel-header__title">Personal Records</h2>
+<span class="material-symbols-outlined icon--filled records-card__star">star</span>
+</div>
+<ul class="records-list">
+<li class="records-list__item">
+<div class="records-list__row">
+<div>
+<p class="records-list__name">Martwy ciąg</p>
+<p class="records-list__value records-list__value--primary">180 kg</p>
+</div>
+<span class="badge badge--success">+5kg</span>
+</div>
+<p class="records-list__meta">Ustanowiono 2 dni temu</p>
+</li>
+<li class="records-list__item">
+<div class="records-list__row">
+<div>
+<p class="records-list__name">Wyciskanie na klatkę</p>
+<p class="records-list__value">110 kg</p>
+</div>
+</div>
+<p class="records-list__meta">Ustanowiono 12 maja</p>
+</li>
+<li class="records-list__item">
+<div class="records-list__row">
+<div>
+<p class="records-list__name">Przysiad</p>
+<p class="records-list__value">145 kg</p>
+</div>
+</div>
+<p class="records-list__meta">Ustanowiono 1 miesiąc temu</p>
+</li>
+<li class="records-list__item">
+<div class="records-list__row">
+<div>
+<p class="records-list__name">Pull-ups (Rep Max)</p>
+<p class="records-list__value">22 reps</p>
+</div>
+<span class="badge badge--primary">TOP 1%</span>
+</div>
+<p class="records-list__meta">Ustanowiono dzisiaj</p>
+</li>
+</ul>
+<!-- Decorative Progress Graph Simulation -->
+<div class="trend-card">
+<span class="trend-card__label">Trend Siły (30 dni)</span>
+<div class="trend-bars">
+<div class="trend-bars__bar" style="height: 40%"></div>
+<div class="trend-bars__bar" style="height: 45%"></div>
+<div class="trend-bars__bar" style="height: 42%"></div>
+<div class="trend-bars__bar trend-bars__bar--primary-weak" style="height: 60%"></div>
+<div class="trend-bars__bar trend-bars__bar--primary-mid" style="height: 75%"></div>
+<div class="trend-bars__bar trend-bars__bar--primary" style="height: 90%"></div>
+<div class="trend-bars__bar trend-bars__bar--primary" style="height: 100%"></div>
+</div>
+</div>
+</div>
+</aside>
+</div>
+</main>
+<!-- Footer -->
+<footer class="site-footer site-footer--inline site-footer--spaced">
+<div class="site-footer__meta">© 2024 Hipertrof.io. All rights reserved.</div>
+<div class="site-footer__links">
+<a class="site-footer__link" href="#">Privacy</a>
+<a class="site-footer__link" href="#">Terms</a>
+<a class="site-footer__link" href="#">Support</a>
+</div>
+</footer>
+<!-- Floating Action Button (Only for relevant screens) -->
+<button class="fab fab--large fab--gradient" type="button" aria-label="Dodaj">
+<span class="material-symbols-outlined fab__icon">add</span>
+</button>
+</body></html>
