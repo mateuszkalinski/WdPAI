@@ -11,6 +11,22 @@ class AppController {
     {
         return $_SERVER["REQUEST_METHOD"] === 'POST';
     }
+
+    // Sprawdza, czy w sesji istnieje ID użytkownika
+    protected function isLogged(): bool
+    {
+        return isset($_SESSION['user_id']);
+    }
+
+    // Metoda "bramkarz" - wyrzuca na stronę logowania, jeśli ktoś nie ma dostępu
+    protected function requireLogin()
+    {
+        if (!$this->isLogged()) {
+            $url = "http://$_SERVER[HTTP_HOST]";
+            header("Location: {$url}/login");
+            exit(); // exit() jest tu kluczowe, przerywa ładowanie reszty strony!
+        }
+    }
  
     protected function render(string $template = null, array $variables = [])
     {

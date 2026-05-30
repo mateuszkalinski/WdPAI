@@ -2,6 +2,7 @@
 <html lang="en">
   <head>
     <?php include __DIR__ . '/partials/head.html'; ?>
+    <script src="/public/scripts/validate.js" defer></script>
   </head>
   <body class="auth-page">
     <form class="auth-form" method="POST" action="\register">
@@ -17,7 +18,7 @@
       <input class="auth-form__field" name="email" type="email" placeholder="Twój email" />
       <input class="auth-form__field" name="password" type="password" placeholder="Twoje hasło" />
       <input class="auth-form__field" name="password2" type="password" placeholder="Powtórz hasło" />
-
+      <input class="auth-form__field" name="username" type="text" placeholder="Nazwa użytkownika (nick)" />
       <input class="auth-form__field" name="firstName" type="text" placeholder="Imie" />
       <input class="auth-form__field" name="lastName" type="text" placeholder="Nazwisko" />
       <button class="btn btn--primary auth-form__submit" type="submit">REGISTER</button>

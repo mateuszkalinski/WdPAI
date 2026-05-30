@@ -2358,6 +2358,15 @@ ul {
   box-shadow: 0 0 0 3px rgba(0, 91, 191, 0.16);
 }
 
+.auth-form__field--invalid {
+  border-color: var(--color-error);
+  color: var(--color-error);
+}
+
+.auth-form__field--invalid:focus {
+  box-shadow: 0 0 0 3px rgba(186, 26, 26, 0.16);
+}
+
 .auth-form__submit {
   margin-top: 0.5rem;
 }

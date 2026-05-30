@@ -6,6 +6,8 @@ require_once __DIR__.'/../repositories/UsersRepository.php';
 class DashboardController extends AppController {
 
     public function index() {
+        $this->requireLogin(); // <-- ZABEZPIECZENIE
+        
         $title = "DASHBOARD";
         $usersRepository = new UsersRepository();
         $users = $usersRepository->getUsers();
