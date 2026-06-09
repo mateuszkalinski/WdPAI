@@ -85,6 +85,10 @@ img {
   max-width: 100%;
 }
 
+[hidden] {
+  display: none !important;
+}
+
 p,
 h1,
 h2,
@@ -771,12 +775,44 @@ ul {
   line-height: 1.6;
 }
 
+.dashboard-volume--wide {
+  grid-column: 1 / -1;
+}
+
 .dashboard-muscle-card__header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: 1rem;
   margin-bottom: 2.5rem;
+}
+
+.dashboard-sidebar-card {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.dashboard-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.dashboard-empty {
+  display: grid;
+  gap: 0.75rem;
+  align-content: center;
+  min-height: 8rem;
+  border-radius: var(--radius-md);
+  background: var(--color-surface-low);
+  padding: 1.25rem;
+  color: var(--color-on-surface-variant);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.dashboard-empty .material-symbols-outlined {
+  color: var(--color-primary);
 }
 
 .muscle-focus {
@@ -1201,6 +1237,141 @@ ul {
   margin-top: 0.25rem;
   color: var(--color-on-surface-variant);
   font-size: 0.75rem;
+}
+
+.history-note {
+  margin-top: 0.75rem;
+  color: var(--color-on-surface-variant);
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+.history-list-panel {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.history-session-list {
+  display: grid;
+  gap: 1rem;
+}
+
+.history-session-card {
+  border: 1px solid var(--color-outline-variant);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-lowest);
+  overflow: hidden;
+}
+
+.history-session-card[open] {
+  border-color: rgba(0, 91, 191, 0.28);
+  box-shadow: var(--shadow-soft);
+}
+
+.history-session-card__summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.25rem;
+  cursor: pointer;
+  list-style: none;
+}
+
+.history-session-card__summary::-webkit-details-marker {
+  display: none;
+}
+
+.history-session-card__title {
+  margin-top: 0.25rem;
+  color: var(--color-on-surface);
+  font-size: 1.125rem;
+  font-weight: 800;
+}
+
+.history-session-card__metrics {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  color: var(--color-on-surface-variant);
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.history-session-card__body {
+  display: grid;
+  gap: 1rem;
+  padding: 0 1.25rem 1.25rem;
+}
+
+.history-exercise-group {
+  display: grid;
+  gap: 0.75rem;
+  border-radius: var(--radius-md);
+  background: var(--color-surface-low);
+  padding: 1rem;
+}
+
+.history-exercise-group__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.history-exercise-group__header h4 {
+  color: var(--color-on-surface);
+  font-size: 0.95rem;
+  font-weight: 800;
+}
+
+.history-exercise-group__header p {
+  margin-top: 0.25rem;
+  color: var(--color-on-surface-variant);
+  font-size: 0.75rem;
+}
+
+.history-set-list {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.history-set-row {
+  display: grid;
+  grid-template-columns: 2.5rem minmax(7rem, 1fr) minmax(4rem, 0.5fr) minmax(5rem, 0.5fr);
+  gap: 0.75rem;
+  align-items: center;
+  border-radius: var(--radius-sm);
+  background: #ffffff;
+  padding: 0.65rem 0.75rem;
+  color: var(--color-on-surface-variant);
+  font-size: 0.8rem;
+}
+
+.history-set-row strong {
+  color: var(--color-on-surface);
+}
+
+.history-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.history-empty {
+  display: grid;
+  gap: 0.75rem;
+  border-radius: var(--radius-md);
+  background: var(--color-surface-low);
+  padding: 1.5rem;
+  color: var(--color-on-surface-variant);
+  line-height: 1.5;
+}
+
+.history-empty .material-symbols-outlined {
+  color: var(--color-primary);
 }
 
 .records-card {
@@ -1735,6 +1906,13 @@ ul {
   letter-spacing: 0;
 }
 
+.session-header__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+}
+
 .session-timer {
   display: inline-flex;
   align-items: center;
@@ -1798,6 +1976,82 @@ ul {
 .session-card__subtitle {
   color: var(--color-on-surface-variant);
   font-weight: 500;
+}
+
+.session-form {
+  position: relative;
+  display: grid;
+  gap: 1.25rem;
+}
+
+.session-field {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.session-field--full {
+  width: 100%;
+}
+
+.session-select,
+.session-number-field,
+.session-textarea,
+.session-finish-field__input {
+  width: 100%;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  background: var(--color-surface-low);
+  color: var(--color-on-surface);
+  transition: border-color var(--ease-standard), background var(--ease-standard), box-shadow var(--ease-standard);
+}
+
+.session-select,
+.session-number-field,
+.session-finish-field__input {
+  min-height: 3rem;
+  padding: 0.75rem 1rem;
+}
+
+.session-select:focus,
+.session-number-field:focus,
+.session-textarea:focus,
+.session-finish-field__input:focus {
+  outline: 0;
+  border-color: var(--color-primary-container);
+  background: #ffffff;
+  box-shadow: 0 0 0 4px rgba(0, 91, 191, 0.08);
+}
+
+.session-select--compact {
+  background: #ffffff;
+}
+
+.session-number-field {
+  text-align: center;
+  font-size: 1.875rem;
+  font-weight: 900;
+}
+
+.session-textarea {
+  min-height: 6rem;
+  resize: vertical;
+  padding: 1rem;
+  line-height: 1.5;
+}
+
+.session-message {
+  min-height: 1.25rem;
+  color: var(--color-on-surface-variant);
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.session-message--success {
+  color: var(--color-secondary);
+}
+
+.session-message--error {
+  color: var(--color-error);
 }
 
 .set-controls {
@@ -2007,6 +2261,23 @@ ul {
   font-weight: 700;
 }
 
+.set-history__empty {
+  display: grid;
+  gap: 0.75rem;
+  justify-items: center;
+  border-radius: var(--radius-md);
+  background: var(--color-surface-low);
+  padding: 2rem 1rem;
+  color: var(--color-on-surface-variant);
+  text-align: center;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.set-history__empty .material-symbols-outlined {
+  color: var(--color-primary);
+}
+
 .next-exercise {
   display: flex;
   align-items: center;
@@ -2060,6 +2331,33 @@ ul {
   left: 50%;
   width: min(100% - 3rem, 28rem);
   transform: translateX(-50%);
+}
+
+.sticky-action--session {
+  display: grid;
+  gap: 0.75rem;
+  width: min(100% - 3rem, 48rem);
+  border: 1px solid rgba(193, 198, 214, 0.4);
+  border-radius: var(--radius-xl);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: var(--shadow-card-strong);
+  padding: 1rem;
+  backdrop-filter: blur(18px);
+}
+
+.sticky-action__fields {
+  display: grid;
+  grid-template-columns: minmax(7rem, 0.45fr) minmax(0, 1fr);
+  gap: 0.75rem;
+}
+
+.session-finish-field {
+  display: grid;
+  gap: 0.35rem;
+  color: var(--color-on-surface-variant);
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
 }
 
 .sticky-action__button {
@@ -2677,6 +2975,11 @@ ul {
     align-self: auto;
   }
 
+  .sticky-action--session {
+    grid-template-columns: 1fr 14rem;
+    align-items: end;
+  }
+
   .search-box__shortcut {
     display: inline-flex;
   }
@@ -2780,7 +3083,8 @@ ul {
   }
 
   .set-controls,
-  .muscle-focus__legend {
+  .muscle-focus__legend,
+  .sticky-action__fields {
     grid-template-columns: 1fr;
   }
 
@@ -2792,6 +3096,20 @@ ul {
 
   .workout-slot__order {
     display: none;
+  }
+
+  .history-session-card__summary,
+  .history-exercise-group__header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .history-session-card__metrics {
+    justify-content: flex-start;
+  }
+
+  .history-set-row {
+    grid-template-columns: 2rem minmax(0, 1fr);
   }
 
   .workout-summary__stats,

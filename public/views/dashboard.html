@@ -1,174 +1,301 @@
+<?php
+  $h = fn($value) => htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
+
+  $formatNumber = function ($value, int $decimals = 0): string {
+      return number_format((float) $value, $decimals, ',', ' ');
+  };
+
+  $formatDate = function ($value): string {
+      if (empty($value)) {
+          return 'Brak danych';
+      }
+
+      try {
+          return (new DateTimeImmutable((string) $value))->format('d.m.Y H:i');
+      } catch (Exception) {
+          return 'Brak danych';
+      }
+  };
+
+  $summary = $summary ?? [];
+  $weeklyMuscles = $weeklyMuscles ?? [];
+  $recentSessions = $recentSessions ?? [];
+  $badges = $badges ?? [];
+
+  $displayName = trim((string) ($_SESSION['firstname'] ?? ''));
+  if ($displayName === '') {
+      $displayName = (string) ($summary['username'] ?? $_SESSION['username'] ?? 'zawodniku');
+  }
+
+  $finishedSessions = (int) ($summary['finished_sessions'] ?? 0);
+  $totalVolume = (float) ($summary['total_volume_kg'] ?? 0);
+  $totalSets = (int) ($summary['total_sets'] ?? 0);
+  $averageRpe = $summary['average_set_rpe'] ?? null;
+  $volumeGoal = 10000;
+  $volumeProgress = $volumeGoal > 0 ? min(100, (int) round(($totalVolume / $volumeGoal) * 100)) : 0;
+  $missingVolume = max(0, $volumeGoal - $totalVolume);
+  $totalWeeklySets = array_sum(array_map(fn($row) => (int) ($row['sets_count'] ?? 0), $weeklyMuscles));
+  $ringScore = $totalWeeklySets > 0 ? min(100, (int) round(((int) ($weeklyMuscles[0]['sets_count'] ?? 0) / $totalWeeklySets) * 100)) : 0;
+  $muscleDots = ['primary', 'secondary', 'tertiary', 'muted'];
+?>
 <!doctype html>
-<html lang="en">
+<html lang="pl">
   <head>
     <?php include __DIR__ . '/partials/head.html'; ?>
-    <title>DASHBOARD</title>
+    <title><?= $h($title ?? 'Dashboard') ?> | Hipertrof.io</title>
   </head>
   <body class="app-body">
     <?php include __DIR__ . '/partials/nav.html'; ?>
 
-<!-- Main Content Canvas -->
-<main class="page-shell page-shell--dashboard">
-<!-- Welcome Section -->
-<header class="page-header dashboard-header">
-<h1 class="page-header__title">Cześć, Bartku!</h1>
-<p class="page-header__lead">Twój postęp w tym tygodniu wygląda imponująco. Tak trzymaj.</p>
-</header>
-<!-- Bento Grid Layout -->
-<div class="dashboard-grid">
-<!-- Left Side: Key Stats -->
-<div class="dashboard-grid__main">
-<!-- Card 1: Total Workouts -->
-<div class="surface-card surface-card--large surface-card--interactive dashboard-stat">
-<div>
-<span class="section-eyebrow">Tygodniowa Aktywność</span>
-<h3 class="dashboard-stat__title">Łącznie Treningów</h3>
-</div>
-<div class="dashboard-stat__summary">
-<span class="dashboard-stat__value dashboard-stat__value--primary">12</span>
-<span class="metric-trend">
-<span class="material-symbols-outlined metric-trend__icon">trending_up</span>
-                            +20%
-                        </span>
-</div>
-</div>
-<!-- Card 2: Overall Volume Progress -->
-<div class="surface-card surface-card--large surface-card--interactive dashboard-volume">
-<span class="section-eyebrow">Objętość Treningowa</span>
-<h3 class="dashboard-volume__title">Postęp Objętości</h3>
-<div class="dashboard-volume__body">
-<div class="dashboard-volume__row">
-<span class="dashboard-volume__value">42,500 <span class="dashboard-volume__unit">kg</span></span>
-<span class="dashboard-volume__goal">Cel: 50k</span>
-</div>
-<div class="progress-meter progress-meter--large progress-meter--soft">
-<div class="progress-meter__bar progress-meter__bar--success-gradient" style="width: 85%;"></div>
-</div>
-<p class="dashboard-volume__note">Brakuje Ci jeszcze 7,500 kg do osiągnięcia tygodniowego rekordu.</p>
-</div>
-</div>
-<!-- Card 3: Muscle Group Focus (Asymmetric Span) -->
-<div class="surface-card surface-card--large dashboard-muscle-card">
-<div class="dashboard-muscle-card__header">
-<div>
-<span class="section-eyebrow">Analiza Struktur</span>
-<h3 class="dashboard-muscle-card__title">Focus na Partie Mięśniowe</h3>
-</div>
-<button class="btn btn--subtle" type="button">Szczegóły</button>
-</div>
-<div class="muscle-focus">
-<div class="muscle-focus__chart">
-<!-- Simulated Radial Chart -->
-<div class="muscle-focus__ring"></div>
-<div class="muscle-focus__score">
-<span class="muscle-focus__percent">78%</span>
-<span class="muscle-focus__label">Wydajność</span>
-</div>
-</div>
-<div class="muscle-focus__legend">
-<div class="muscle-focus__legend-item">
-<div class="muscle-focus__legend-heading">
-<div class="muscle-focus__dot muscle-focus__dot--primary"></div>
-<span class="muscle-focus__name">Klatka Piersiowa</span>
-</div>
-<span class="muscle-focus__value">45%</span>
-</div>
-<div class="muscle-focus__legend-item">
-<div class="muscle-focus__legend-heading">
-<div class="muscle-focus__dot muscle-focus__dot--secondary"></div>
-<span class="muscle-focus__name">Plecy</span>
-</div>
-<span class="muscle-focus__value">32%</span>
-</div>
-<div class="muscle-focus__legend-item">
-<div class="muscle-focus__legend-heading">
-<div class="muscle-focus__dot muscle-focus__dot--tertiary"></div>
-<span class="muscle-focus__name">Nogi</span>
-</div>
-<span class="muscle-focus__value">18%</span>
-</div>
-<div class="muscle-focus__legend-item">
-<div class="muscle-focus__legend-heading">
-<div class="muscle-focus__dot muscle-focus__dot--muted"></div>
-<span class="muscle-focus__name">Inne</span>
-</div>
-<span class="muscle-focus__value">5%</span>
-</div>
-</div>
-</div>
-</div>
-</div>
-<!-- Right Side: Calendar & Secondary Actions -->
-<div class="dashboard-grid__sidebar">
-<!-- Calendar Widget -->
-<div class="surface-card surface-card--medium mini-calendar">
-<div class="mini-calendar__header">
-<h4 class="mini-calendar__title">Maj 2024</h4>
-<div class="mini-calendar__controls">
-<span class="material-symbols-outlined mini-calendar__control">chevron_left</span>
-<span class="material-symbols-outlined mini-calendar__control">chevron_right</span>
-</div>
-</div>
-<div class="mini-calendar__grid">
-<span class="mini-calendar__weekday">Pn</span>
-<span class="mini-calendar__weekday">Wt</span>
-<span class="mini-calendar__weekday">Śr</span>
-<span class="mini-calendar__weekday">Cz</span>
-<span class="mini-calendar__weekday">Pt</span>
-<span class="mini-calendar__weekday">So</span>
-<span class="mini-calendar__weekday">Nd</span>
-<span class="mini-calendar__day mini-calendar__day--muted">29</span>
-<span class="mini-calendar__day mini-calendar__day--muted">30</span>
-<span class="mini-calendar__day">1</span>
-<span class="mini-calendar__day">2</span>
-<span class="mini-calendar__day">3</span>
-<span class="mini-calendar__day mini-calendar__day--soft-active">4</span>
-<span class="mini-calendar__day">5</span>
-<span class="mini-calendar__day">6</span>
-<span class="mini-calendar__day mini-calendar__day--has-event">7</span>
-<span class="mini-calendar__day">8</span>
-<span class="mini-calendar__day">9</span>
-<span class="mini-calendar__day mini-calendar__day--active">10</span>
-<span class="mini-calendar__day">11</span>
-<span class="mini-calendar__day">12</span>
-<!-- ... simplified calendar -->
-</div>
-<div class="mini-calendar__agenda">
-<div class="mini-calendar__event">
-<div>
-<p class="mini-calendar__event-label">Dzisiaj</p>
-<p class="mini-calendar__event-title">Trening D: Nogi + Cardio</p>
-<p class="mini-calendar__event-meta">18:30 • Siłownia CityFit</p>
-</div>
-</div>
-</div>
-</div>
-<!-- Motivation/Hero Image Card -->
-<div class="motivation-card">
-<img alt="Intensity" class="motivation-card__image" data-alt="dramatic low-key lighting of a professional athlete squatting in a high-end gym with focused expression and steam in the air" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDXUQ9z45pJdeUDByXu-F21-VrJGAcq4jFMdJ5fb9IyBLXuUUdbqv4pP77iVOJR4AloyuOU2VvonFHShE-oxKCX53KDZX8xWuZ025dkaEmsZTbZEXI1DttMuGcVjVkYERMtTLnLT0Pc7FbhNGm7luuadGiKu0K-CglcFQGPhv0v8qfLTo1m6md0xKHI8pR5_lX4gWJC3qlmp5b-j63v5-kE_aU0Vsi7KbX4wRy8TeP6QmHpkH937OFNt4R4ij1s1Dcs9P6vpYXpkwM"/>
-<div class="motivation-card__overlay">
-<span class="motivation-card__eyebrow">Wytrwałość</span>
-<h4 class="motivation-card__title">Dyscyplina buduje Mistrzów.</h4>
-</div>
-</div>
-</div>
-</div>
-</main>
-<!-- Footer -->
-<footer class="site-footer site-footer--spaced">
-<div class="site-footer__inner">
-<div class="site-footer__meta-group">
-<span class="site-footer__meta">© 2026 Hipertrof.io. All rights reserved.</span>
-</div>
-<div class="site-footer__links">
-<a class="site-footer__link" href="#">Privacy</a>
-<a class="site-footer__link" href="#">Terms</a>
-<a class="site-footer__link" href="#">Support</a>
-</div>
-</div>
-</footer>
-<!-- Floating Action Button -->
-<button class="fab fab--large fab--gradient" type="button" aria-label="Dodaj">
-<span class="material-symbols-outlined fab__icon">add</span>
-</button>
-</body></html>
+    <main class="page-shell page-shell--dashboard">
+      <header class="page-header dashboard-header">
+        <h1 class="page-header__title">Cześć, <?= $h($displayName) ?>!</h1>
+        <p class="page-header__lead page-header__lead--narrow">
+          To są Twoje aktualne statystyki z zapisanych sesji treningowych.
+        </p>
+      </header>
+
+      <div class="dashboard-grid">
+        <div class="dashboard-grid__main">
+          <section class="surface-card surface-card--large surface-card--interactive dashboard-stat">
+            <div>
+              <span class="section-eyebrow">Historia treningów</span>
+              <h2 class="dashboard-stat__title">Zakończone treningi</h2>
+            </div>
+            <div class="dashboard-stat__summary">
+              <span class="dashboard-stat__value dashboard-stat__value--primary"><?= $finishedSessions ?></span>
+              <span class="metric-trend">
+                <span class="material-symbols-outlined metric-trend__icon">event_available</span>
+                DB
+              </span>
+            </div>
+          </section>
+
+          <section class="surface-card surface-card--large surface-card--interactive dashboard-stat">
+            <div>
+              <span class="section-eyebrow">Wykonane serie</span>
+              <h2 class="dashboard-stat__title">Serie i średnie RPE</h2>
+            </div>
+            <div class="dashboard-stat__summary">
+              <span class="dashboard-stat__value"><?= $totalSets ?></span>
+              <span class="metric-trend">
+                <span class="material-symbols-outlined metric-trend__icon">speed</span>
+                RPE <?= $averageRpe !== null ? $h($formatNumber($averageRpe, 1)) : 'brak' ?>
+              </span>
+            </div>
+          </section>
+
+          <section class="surface-card surface-card--large surface-card--interactive dashboard-volume dashboard-volume--wide">
+            <span class="section-eyebrow">Objętość treningowa</span>
+            <h2 class="dashboard-volume__title">Całkowita objętość</h2>
+            <div class="dashboard-volume__body">
+              <div class="dashboard-volume__row">
+                <span class="dashboard-volume__value">
+                  <?= $h($formatNumber($totalVolume)) ?> <span class="dashboard-volume__unit">kg</span>
+                </span>
+                <span class="dashboard-volume__goal">Cel: <?= $h($formatNumber($volumeGoal)) ?> kg</span>
+              </div>
+              <div class="progress-meter progress-meter--large progress-meter--soft" aria-label="Postęp objętości">
+                <div class="progress-meter__bar progress-meter__bar--success-gradient" style="width: <?= $volumeProgress ?>%;"></div>
+              </div>
+              <p class="dashboard-volume__note">
+                <?= $missingVolume > 0
+                    ? 'Do celu brakuje ' . $h($formatNumber($missingVolume)) . ' kg.'
+                    : 'Cel objętości został osiągnięty.'
+                ?>
+              </p>
+            </div>
+          </section>
+
+          <section class="surface-card surface-card--large dashboard-muscle-card">
+            <div class="dashboard-muscle-card__header">
+              <div>
+                <span class="section-eyebrow">Ostatni aktywny tydzień</span>
+                <h2 class="dashboard-muscle-card__title">Partie mięśniowe</h2>
+              </div>
+              <a class="btn btn--subtle" href="/history">Historia</a>
+            </div>
+
+            <div class="muscle-focus">
+              <div class="muscle-focus__chart">
+                <div class="muscle-focus__ring"></div>
+                <div class="muscle-focus__score">
+                  <span class="muscle-focus__percent"><?= $ringScore ?>%</span>
+                  <span class="muscle-focus__label">top partia</span>
+                </div>
+              </div>
+
+              <div class="muscle-focus__legend">
+                <?php if (empty($weeklyMuscles)): ?>
+                  <div class="dashboard-empty">
+                    <span class="material-symbols-outlined">fitness_center</span>
+                    <p>Brak zapisanych serii w ostatnim tygodniu.</p>
+                  </div>
+                <?php else: ?>
+                  <?php foreach ($weeklyMuscles as $index => $muscle): ?>
+                    <?php
+                      $sets = (int) ($muscle['sets_count'] ?? 0);
+                      $percent = $totalWeeklySets > 0 ? (int) round(($sets / $totalWeeklySets) * 100) : 0;
+                      $dot = $muscleDots[$index] ?? 'muted';
+                    ?>
+                    <div class="muscle-focus__legend-item">
+                      <div class="muscle-focus__legend-heading">
+                        <div class="muscle-focus__dot muscle-focus__dot--<?= $h($dot) ?>"></div>
+                        <span class="muscle-focus__name"><?= $h($muscle['muscle_group'] ?? 'Partia') ?></span>
+                      </div>
+                      <span class="muscle-focus__value"><?= $percent ?>%</span>
+                      <span class="records-list__meta">
+                        <?= $sets ?> serii, <?= $h($formatNumber($muscle['volume_kg'] ?? 0)) ?> kg
+                      </span>
+                    </div>
+                  <?php endforeach; ?>
+                <?php endif; ?>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <aside class="dashboard-grid__sidebar">
+          <section class="surface-card surface-card--medium dashboard-sidebar-card">
+            <div class="panel-header">
+              <h2 class="panel-header__title">Aktywny plan</h2>
+              <span class="material-symbols-outlined">calendar_month</span>
+            </div>
+            <?php if ($activePlan): ?>
+              <ul class="records-list">
+                <li class="records-list__item">
+                  <p class="records-list__name"><?= $h($activePlan['custom_name'] ?: $activePlan['name']) ?></p>
+                  <p class="records-list__value records-list__value--primary"><?= (int) $activePlan['training_days'] ?> dni</p>
+                  <p class="records-list__meta">
+                    Cel: <?= $h($activePlan['goal']) ?>, poziom: <?= $h($activePlan['level']) ?>
+                  </p>
+                </li>
+              </ul>
+              <a class="btn btn--subtle btn--full" href="/planer">Otwórz planer</a>
+            <?php else: ?>
+              <div class="dashboard-empty">
+                <span class="material-symbols-outlined">add_task</span>
+                <p>Nie masz jeszcze aktywnego planu.</p>
+              </div>
+              <a class="btn btn--primary btn--full" href="/planer">Utwórz plan</a>
+            <?php endif; ?>
+          </section>
+
+          <section class="surface-card surface-card--medium dashboard-sidebar-card">
+            <div class="panel-header">
+              <h2 class="panel-header__title">Ostatni trening</h2>
+              <span class="material-symbols-outlined">timer</span>
+            </div>
+            <?php if ($lastSession): ?>
+              <ul class="records-list">
+                <li class="records-list__item">
+                  <p class="records-list__name"><?= $h($lastSession['name'] ?? 'Trening') ?></p>
+                  <p class="records-list__value records-list__value--primary">
+                    <?= $h($formatNumber($lastSession['volume_kg'] ?? 0)) ?> kg
+                  </p>
+                  <p class="records-list__meta"><?= $h($formatDate($lastSession['started_at'] ?? null)) ?></p>
+                </li>
+              </ul>
+              <div class="dashboard-detail-grid">
+                <div class="stat-chip">
+                  <span class="stat-chip__label">Serie</span>
+                  <span class="stat-chip__value"><?= (int) ($lastSession['sets_count'] ?? 0) ?></span>
+                </div>
+                <div class="stat-chip">
+                  <span class="stat-chip__label">RPE</span>
+                  <span class="stat-chip__value">
+                    <?= ($lastSession['session_rpe'] ?? null) !== null ? $h($formatNumber($lastSession['session_rpe'], 1)) : 'brak' ?>
+                  </span>
+                </div>
+              </div>
+            <?php else: ?>
+              <div class="dashboard-empty">
+                <span class="material-symbols-outlined">history</span>
+                <p>Po pierwszej sesji pojawi się tu podsumowanie treningu.</p>
+              </div>
+            <?php endif; ?>
+          </section>
+
+          <section class="surface-card surface-card--medium records-card">
+            <div class="panel-header">
+              <h2 class="panel-header__title">Ostatnie sesje</h2>
+              <a class="btn btn--subtle" href="/history">Zobacz</a>
+            </div>
+            <ul class="records-list">
+              <?php if (empty($recentSessions)): ?>
+                <li class="records-list__item">
+                  <p class="records-list__name">Brak sesji</p>
+                  <p class="records-list__meta">Zapisane treningi pojawią się w tym miejscu.</p>
+                </li>
+              <?php else: ?>
+                <?php foreach ($recentSessions as $session): ?>
+                  <li class="records-list__item">
+                    <div class="records-list__row">
+                      <div>
+                        <p class="records-list__name"><?= $h($session['name'] ?? 'Trening') ?></p>
+                        <p class="records-list__value"><?= $h($formatNumber($session['volume_kg'] ?? 0)) ?> kg</p>
+                      </div>
+                      <span class="badge badge--<?= ($session['status'] ?? '') === 'finished' ? 'success' : 'neutral' ?>">
+                        <?= $h($session['status'] ?? 'draft') ?>
+                      </span>
+                    </div>
+                    <p class="records-list__meta">
+                      <?= $h($formatDate($session['started_at'] ?? null)) ?> · <?= (int) ($session['sets_count'] ?? 0) ?> serii
+                    </p>
+                  </li>
+                <?php endforeach; ?>
+              <?php endif; ?>
+            </ul>
+          </section>
+
+          <section class="surface-card surface-card--medium records-card">
+            <div class="panel-header">
+              <h2 class="panel-header__title">Odznaki</h2>
+              <span class="material-symbols-outlined icon--filled records-card__star">workspace_premium</span>
+            </div>
+            <ul class="records-list">
+              <?php if (empty($badges)): ?>
+                <li class="records-list__item">
+                  <p class="records-list__name">Brak odznak</p>
+                  <p class="records-list__meta">Odznaki zostaną przyznane automatycznie po spełnieniu warunków.</p>
+                </li>
+              <?php else: ?>
+                <?php foreach ($badges as $badge): ?>
+                  <li class="records-list__item">
+                    <div class="records-list__row">
+                      <div>
+                        <p class="records-list__name"><?= $h($badge['badge_name']) ?></p>
+                        <p class="records-list__value records-list__value--primary">
+                          <?= $h($formatNumber($badge['current_value'] ?? 0)) ?>
+                        </p>
+                      </div>
+                      <span class="badge badge--primary"><?= $h($badge['criteria_type']) ?></span>
+                    </div>
+                    <p class="records-list__meta"><?= $h($formatDate($badge['awarded_at'] ?? null)) ?></p>
+                  </li>
+                <?php endforeach; ?>
+              <?php endif; ?>
+            </ul>
+          </section>
+        </aside>
+      </div>
+    </main>
+
+    <footer class="site-footer site-footer--spaced">
+      <div class="site-footer__inner">
+        <div class="site-footer__meta-group">
+          <span class="site-footer__meta">© 2026 Hipertrof.io. All rights reserved.</span>
+        </div>
+        <div class="site-footer__links">
+          <a class="site-footer__link" href="/dashboard">Dashboard</a>
+          <a class="site-footer__link" href="/planer">Planer</a>
+          <a class="site-footer__link" href="/history">Historia</a>
+        </div>
+      </div>
+    </footer>
+
+    <a class="fab fab--large fab--gradient" href="/session" aria-label="Rozpocznij trening">
+      <span class="material-symbols-outlined fab__icon">add</span>
+    </a>
+  </body>
+</html>

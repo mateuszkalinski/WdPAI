@@ -1,225 +1,438 @@
+<?php
+  $h = fn($value) => htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
+
+  $formatNumber = function ($value, int $decimals = 0): string {
+      return number_format((float) $value, $decimals, ',', ' ');
+  };
+
+  $formatWeight = function ($value): string {
+      $formatted = number_format((float) $value, 2, ',', ' ');
+      return rtrim(rtrim($formatted, '0'), ',');
+  };
+
+  $dateFromValue = function ($value): ?DateTimeImmutable {
+      if (empty($value)) {
+          return null;
+      }
+
+      try {
+          return new DateTimeImmutable((string) $value);
+      } catch (Exception) {
+          return null;
+      }
+  };
+
+  $formatDateTime = function ($value) use ($dateFromValue): string {
+      $date = $dateFromValue($value);
+      return $date ? $date->format('d.m.Y H:i') : 'Brak danych';
+  };
+
+  $formatDate = function ($value) use ($dateFromValue): string {
+      $date = $dateFromValue($value);
+      return $date ? $date->format('d.m.Y') : 'Brak danych';
+  };
+
+  $formatDuration = function ($minutes): string {
+      if ($minutes === null || $minutes === '') {
+          return 'Brak';
+      }
+
+      $minutes = (int) $minutes;
+      if ($minutes < 60) {
+          return $minutes.' min';
+      }
+
+      $hours = intdiv($minutes, 60);
+      $remainingMinutes = $minutes % 60;
+      return $remainingMinutes > 0 ? $hours.' h '.$remainingMinutes.' min' : $hours.' h';
+  };
+
+  $groupSetsByExercise = function (array $sets): array {
+      $grouped = [];
+
+      foreach ($sets as $set) {
+          $key = (string) ($set['exercise_name'] ?? 'Cwiczenie');
+
+          if (!isset($grouped[$key])) {
+              $grouped[$key] = [
+                  'exercise_name' => $key,
+                  'equipment_name' => $set['equipment_name'] ?? '',
+                  'muscle_groups' => $set['muscle_groups'] ?? '',
+                  'sets' => [],
+                  'max_weight_kg' => 0,
+                  'total_volume_kg' => 0
+              ];
+          }
+
+          $weight = (float) ($set['weight_kg'] ?? 0);
+          $reps = (int) ($set['reps'] ?? 0);
+          $grouped[$key]['sets'][] = $set;
+          $grouped[$key]['max_weight_kg'] = max($grouped[$key]['max_weight_kg'], $weight);
+          $grouped[$key]['total_volume_kg'] += $weight * $reps;
+      }
+
+      return array_values($grouped);
+  };
+
+  $summary = $summary ?? [];
+  $sessions = $sessions ?? [];
+  $setsBySession = $setsBySession ?? [];
+  $records = $records ?? [];
+  $finishedSessionsCount = (int) ($summary['finished_sessions'] ?? count($sessions));
+  $latestSession = $sessions[0] ?? null;
+  $latestSessionId = $latestSession ? (int) $latestSession['id'] : null;
+  $latestSets = $latestSessionId ? ($setsBySession[$latestSessionId] ?? []) : [];
+  $latestExercises = $groupSetsByExercise($latestSets);
+
+  $statusLabels = [
+      'planned' => 'planowany',
+      'in_progress' => 'w trakcie',
+      'finished' => 'zakończony',
+      'cancelled' => 'odwołany'
+  ];
+  $setTypeLabels = [
+      'warmup' => 'rozgrzewka',
+      'working' => 'robocza',
+      'drop' => 'drop',
+      'failure' => 'do upadku'
+  ];
+  $monthNames = [
+      1 => 'styczeń',
+      2 => 'luty',
+      3 => 'marzec',
+      4 => 'kwiecień',
+      5 => 'maj',
+      6 => 'czerwiec',
+      7 => 'lipiec',
+      8 => 'sierpień',
+      9 => 'wrzesień',
+      10 => 'październik',
+      11 => 'listopad',
+      12 => 'grudzień'
+  ];
+
+  $sessionDates = [];
+  foreach ($sessions as $session) {
+      $sessionDate = $dateFromValue($session['started_at'] ?? null);
+      if ($sessionDate) {
+          $key = $sessionDate->format('Y-m-d');
+          $sessionDates[$key] = ($sessionDates[$key] ?? 0) + 1;
+      }
+  }
+
+  $calendarBase = $latestSession ? $dateFromValue($latestSession['started_at']) : new DateTimeImmutable('now');
+  $calendarBase = $calendarBase ?: new DateTimeImmutable('now');
+  $monthStart = $calendarBase->modify('first day of this month')->setTime(0, 0);
+  $calendarStart = $monthStart->modify('-'.(((int) $monthStart->format('N')) - 1).' days');
+  $selectedDate = $latestSession ? ($dateFromValue($latestSession['started_at'])?->format('Y-m-d') ?? '') : '';
+  $monthTitle = ucfirst($monthNames[(int) $monthStart->format('n')]).' '.$monthStart->format('Y');
+
+  $trendSessions = array_reverse(array_slice($sessions, 0, 7));
+  $maxTrendVolume = max(1, ...array_map(fn($session) => (float) ($session['volume_kg'] ?? 0), $trendSessions));
+?>
 <!doctype html>
-<html lang="en">
+<html lang="pl">
   <head>
     <?php include __DIR__ . '/partials/head.html'; ?>
-    <title>DASHBOARD</title>
+    <title><?= $h($title ?? 'Historia') ?> | Hipertrof.io</title>
   </head>
   <body class="app-body">
     <?php include __DIR__ . '/partials/nav.html'; ?>
+
     <main class="page-shell page-shell--history">
-<!-- Header Section -->
-<header class="page-header">
-<h1 class="page-header__title">Historia &amp; Progres</h1>
-<p class="page-header__lead page-header__lead--narrow">Monitoruj swoje postępy, przeglądaj kalendarz treningowy i bij rekordy życiowe.</p>
-</header>
-<!-- Main Layout: Asymmetric Bento Grid -->
-<div class="history-layout">
-<!-- Left Column: Calendar View (8 cols) -->
-<div class="history-layout__main">
-<section class="surface-card surface-card--large calendar-panel">
-<div class="panel-header panel-header--wide">
-<h2 class="panel-header__title">Maj 2024</h2>
-<div class="panel-header__actions">
-<button class="icon-button icon-button--soft" type="button" aria-label="Poprzedni miesiąc">
-<span class="material-symbols-outlined">chevron_left</span>
-</button>
-<button class="icon-button icon-button--soft" type="button" aria-label="Następny miesiąc">
-<span class="material-symbols-outlined">chevron_right</span>
-</button>
-</div>
-</div>
-<!-- Calendar Grid -->
-<div class="calendar-board">
-<!-- Days Header -->
-<div class="calendar-board__weekday">Pn</div>
-<div class="calendar-board__weekday">Wt</div>
-<div class="calendar-board__weekday">Śr</div>
-<div class="calendar-board__weekday">Cz</div>
-<div class="calendar-board__weekday">Pt</div>
-<div class="calendar-board__weekday">So</div>
-<div class="calendar-board__weekday">Nd</div>
-<!-- Previous month dates -->
-<div class="calendar-board__cell calendar-board__cell--muted">29</div>
-<div class="calendar-board__cell calendar-board__cell--muted">30</div>
-<!-- Current Month -->
-<div class="calendar-board__cell calendar-board__cell--interactive">
-<span class="calendar-board__date">1</span>
-</div>
-<div class="calendar-board__cell calendar-board__cell--interactive calendar-board__cell--has-workout">
-<div class="calendar-board__highlight"></div>
-<span class="calendar-board__date calendar-board__date--primary">2</span>
-<div class="calendar-board__dot"></div>
-</div>
-<div class="calendar-board__cell calendar-board__cell--interactive">
-<span class="calendar-board__date">3</span>
-</div>
-<div class="calendar-board__cell calendar-board__cell--interactive">
-<span class="calendar-board__date">4</span>
-</div>
-<div class="calendar-board__cell calendar-board__cell--interactive">
-<span class="calendar-board__date">5</span>
-</div>
-<!-- Week 2 -->
-<div class="calendar-board__cell calendar-board__cell--interactive calendar-board__cell--has-workout">
-<div class="calendar-board__highlight"></div>
-<span class="calendar-board__date calendar-board__date--primary">6</span>
-<div class="calendar-board__dot"></div>
-</div>
-<div class="calendar-board__cell calendar-board__cell--interactive">
-<span class="calendar-board__date">7</span>
-</div>
-<!-- Active Selected Date 8 -->
-<div class="calendar-board__cell calendar-board__cell--selected">
-<span class="calendar-board__date calendar-board__date--selected">8</span>
-</div>
-<div class="calendar-board__cell calendar-board__cell--interactive calendar-board__cell--has-workout">
-<div class="calendar-board__highlight calendar-board__highlight--outlined"></div>
-<span class="calendar-board__date calendar-board__date--primary">9</span>
-<div class="calendar-board__dot"></div>
-</div>
-<div class="calendar-board__cell calendar-board__cell--interactive">
-<span class="calendar-board__date">10</span>
-</div>
-<div class="calendar-board__cell calendar-board__cell--interactive">
-<span class="calendar-board__date">11</span>
-</div>
-<div class="calendar-board__cell calendar-board__cell--interactive">
-<span class="calendar-board__date">12</span>
-</div>
-<!-- Rest of the grid (simplified for visual) -->
-<div class="calendar-board__cell calendar-board__cell--quiet">13</div>
-<div class="calendar-board__cell calendar-board__cell--quiet">14</div>
-<div class="calendar-board__cell calendar-board__cell--quiet">15</div>
-<div class="calendar-board__cell calendar-board__cell--quiet">16</div>
-<div class="calendar-board__cell calendar-board__cell--quiet">17</div>
-<div class="calendar-board__cell calendar-board__cell--quiet">18</div>
-<div class="calendar-board__cell calendar-board__cell--quiet">19</div>
-<div class="calendar-board__cell calendar-board__cell--quiet">20</div>
-<div class="calendar-board__cell calendar-board__cell--quiet">21</div>
-<div class="calendar-board__cell calendar-board__cell--quiet">22</div>
-<div class="calendar-board__cell calendar-board__cell--quiet">23</div>
-<div class="calendar-board__cell calendar-board__cell--quiet">24</div>
-<div class="calendar-board__cell calendar-board__cell--quiet">25</div>
-<div class="calendar-board__cell calendar-board__cell--quiet">26</div>
-<div class="calendar-board__cell calendar-board__cell--quiet">27</div>
-<div class="calendar-board__cell calendar-board__cell--quiet">28</div>
-<div class="calendar-board__cell calendar-board__cell--quiet">29</div>
-<div class="calendar-board__cell calendar-board__cell--quiet">30</div>
-<div class="calendar-board__cell calendar-board__cell--quiet">31</div>
-</div>
-</section>
-<!-- Workout Summary Card (Opens on Tap) -->
-<section class="surface-card surface-card--large surface-card--outlined-primary workout-summary">
-<div class="workout-summary__header">
-<div>
-<span class="section-eyebrow section-eyebrow--primary">Szczegóły treningu • 8 Maj</span>
-<h3 class="workout-summary__title">Workout: Legs B</h3>
-</div>
-<div class="workout-summary__stats">
-<div class="stat-chip">
-<span class="stat-chip__label">Czas trwania</span>
-<span class="stat-chip__value">45 min</span>
-</div>
-<div class="stat-chip stat-chip--primary">
-<span class="stat-chip__label">Objętość</span>
-<span class="stat-chip__value">5000kg</span>
-</div>
-</div>
-</div>
-<div class="workout-summary__exercises">
-<div class="exercise-mini-card">
-<span class="material-symbols-outlined exercise-mini-card__icon">fitness_center</span>
-<p class="exercise-mini-card__title">Przysiad ze sztangą</p>
-<p class="exercise-mini-card__meta">4 serie x 8 powt.</p>
-</div>
-<div class="exercise-mini-card">
-<span class="material-symbols-outlined exercise-mini-card__icon">settings_accessibility</span>
-<p class="exercise-mini-card__title">Wypychanie na suwnicy</p>
-<p class="exercise-mini-card__meta">3 serie x 12 powt.</p>
-</div>
-<div class="exercise-mini-card">
-<span class="material-symbols-outlined exercise-mini-card__icon">bolt</span>
-<p class="exercise-mini-card__title">Uginanie nóg leżąc</p>
-<p class="exercise-mini-card__meta">3 serie x 15 powt.</p>
-</div>
-</div>
-</section>
-</div>
-<!-- Right Column: Personal Records (4 cols) -->
-<aside class="history-layout__aside">
-<div class="surface-card surface-card--medium records-card">
-<div class="panel-header">
-<h2 class="panel-header__title">Personal Records</h2>
-<span class="material-symbols-outlined icon--filled records-card__star">star</span>
-</div>
-<ul class="records-list">
-<li class="records-list__item">
-<div class="records-list__row">
-<div>
-<p class="records-list__name">Martwy ciąg</p>
-<p class="records-list__value records-list__value--primary">180 kg</p>
-</div>
-<span class="badge badge--success">+5kg</span>
-</div>
-<p class="records-list__meta">Ustanowiono 2 dni temu</p>
-</li>
-<li class="records-list__item">
-<div class="records-list__row">
-<div>
-<p class="records-list__name">Wyciskanie na klatkę</p>
-<p class="records-list__value">110 kg</p>
-</div>
-</div>
-<p class="records-list__meta">Ustanowiono 12 maja</p>
-</li>
-<li class="records-list__item">
-<div class="records-list__row">
-<div>
-<p class="records-list__name">Przysiad</p>
-<p class="records-list__value">145 kg</p>
-</div>
-</div>
-<p class="records-list__meta">Ustanowiono 1 miesiąc temu</p>
-</li>
-<li class="records-list__item">
-<div class="records-list__row">
-<div>
-<p class="records-list__name">Pull-ups (Rep Max)</p>
-<p class="records-list__value">22 reps</p>
-</div>
-<span class="badge badge--primary">TOP 1%</span>
-</div>
-<p class="records-list__meta">Ustanowiono dzisiaj</p>
-</li>
-</ul>
-<!-- Decorative Progress Graph Simulation -->
-<div class="trend-card">
-<span class="trend-card__label">Trend Siły (30 dni)</span>
-<div class="trend-bars">
-<div class="trend-bars__bar" style="height: 40%"></div>
-<div class="trend-bars__bar" style="height: 45%"></div>
-<div class="trend-bars__bar" style="height: 42%"></div>
-<div class="trend-bars__bar trend-bars__bar--primary-weak" style="height: 60%"></div>
-<div class="trend-bars__bar trend-bars__bar--primary-mid" style="height: 75%"></div>
-<div class="trend-bars__bar trend-bars__bar--primary" style="height: 90%"></div>
-<div class="trend-bars__bar trend-bars__bar--primary" style="height: 100%"></div>
-</div>
-</div>
-</div>
-</aside>
-</div>
-</main>
-<!-- Footer -->
-<footer class="site-footer site-footer--inline site-footer--spaced">
-<div class="site-footer__meta">© 2024 Hipertrof.io. All rights reserved.</div>
-<div class="site-footer__links">
-<a class="site-footer__link" href="#">Privacy</a>
-<a class="site-footer__link" href="#">Terms</a>
-<a class="site-footer__link" href="#">Support</a>
-</div>
-</footer>
-<!-- Floating Action Button (Only for relevant screens) -->
-<button class="fab fab--large fab--gradient" type="button" aria-label="Dodaj">
-<span class="material-symbols-outlined fab__icon">add</span>
-</button>
-</body></html>
+      <header class="page-header">
+        <h1 class="page-header__title">Historia i progres</h1>
+        <p class="page-header__lead page-header__lead--narrow">
+          Przegląd zapisanych treningów, wykonanych serii, objętości i najlepszych wyników.
+        </p>
+      </header>
+
+      <div class="history-layout">
+        <div class="history-layout__main">
+          <section class="surface-card surface-card--large calendar-panel">
+            <div class="panel-header panel-header--wide">
+              <div>
+                <span class="section-eyebrow">Kalendarz aktywności</span>
+                <h2 class="panel-header__title"><?= $h($monthTitle) ?></h2>
+              </div>
+              <span class="badge badge--primary"><?= $finishedSessionsCount ?> zakończonych</span>
+            </div>
+
+            <div class="calendar-board" aria-label="Dni z zapisanymi treningami">
+              <?php foreach (['Pn', 'Wt', 'Śr', 'Cz', 'Pt', 'So', 'Nd'] as $weekday): ?>
+                <div class="calendar-board__weekday"><?= $h($weekday) ?></div>
+              <?php endforeach; ?>
+
+              <?php for ($dayOffset = 0; $dayOffset < 42; $dayOffset++): ?>
+                <?php
+                  $day = $calendarStart->modify('+'.$dayOffset.' days');
+                  $dateKey = $day->format('Y-m-d');
+                  $isCurrentMonth = $day->format('m') === $monthStart->format('m');
+                  $hasWorkout = isset($sessionDates[$dateKey]);
+                  $workoutCount = $sessionDates[$dateKey] ?? 0;
+                  $workoutTitle = $workoutCount === 1 ? '1 trening' : $workoutCount.' treningi';
+                  $isSelected = $dateKey === $selectedDate;
+                  $classes = ['calendar-board__cell'];
+
+                  if (!$isCurrentMonth) {
+                      $classes[] = 'calendar-board__cell--muted';
+                  } else {
+                      $classes[] = 'calendar-board__cell--interactive';
+                  }
+
+                  if ($hasWorkout) {
+                      $classes[] = 'calendar-board__cell--has-workout';
+                  }
+
+                  if ($isSelected) {
+                      $classes[] = 'calendar-board__cell--selected';
+                  }
+                ?>
+                <div class="<?= $h(implode(' ', $classes)) ?>" title="<?= $hasWorkout ? $h($workoutTitle) : '' ?>">
+                  <?php if ($hasWorkout && !$isSelected): ?>
+                    <div class="calendar-board__highlight"></div>
+                  <?php endif; ?>
+                  <span class="calendar-board__date <?= $isSelected ? 'calendar-board__date--selected' : ($hasWorkout ? 'calendar-board__date--primary' : '') ?>">
+                    <?= $day->format('j') ?>
+                  </span>
+                  <?php if ($hasWorkout): ?>
+                    <div class="calendar-board__dot"></div>
+                  <?php endif; ?>
+                </div>
+              <?php endfor; ?>
+            </div>
+          </section>
+
+          <section class="surface-card surface-card--large surface-card--outlined-primary workout-summary">
+            <?php if ($latestSession): ?>
+              <div class="workout-summary__header">
+                <div>
+                  <span class="section-eyebrow section-eyebrow--primary">
+                    Szczegóły treningu · <?= $h($formatDateTime($latestSession['started_at'] ?? null)) ?>
+                  </span>
+                  <h2 class="workout-summary__title"><?= $h($latestSession['name'] ?? 'Trening') ?></h2>
+                  <?php if (!empty($latestSession['notes'])): ?>
+                    <p class="history-note"><?= $h($latestSession['notes']) ?></p>
+                  <?php endif; ?>
+                </div>
+                <div class="workout-summary__stats">
+                  <div class="stat-chip">
+                    <span class="stat-chip__label">Czas</span>
+                    <span class="stat-chip__value"><?= $h($formatDuration($latestSession['duration_minutes'] ?? null)) ?></span>
+                  </div>
+                  <div class="stat-chip stat-chip--primary">
+                    <span class="stat-chip__label">Objętość</span>
+                    <span class="stat-chip__value"><?= $h($formatNumber($latestSession['volume_kg'] ?? 0)) ?> kg</span>
+                  </div>
+                  <div class="stat-chip">
+                    <span class="stat-chip__label">Serie</span>
+                    <span class="stat-chip__value"><?= (int) ($latestSession['sets_count'] ?? 0) ?></span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="workout-summary__exercises">
+                <?php foreach ($latestExercises as $exercise): ?>
+                  <?php
+                    $setPreview = array_map(
+                        fn($set) => $formatWeight($set['weight_kg'] ?? 0).' kg x '.(int) ($set['reps'] ?? 0),
+                        $exercise['sets']
+                    );
+                  ?>
+                  <article class="exercise-mini-card">
+                    <span class="material-symbols-outlined exercise-mini-card__icon">fitness_center</span>
+                    <p class="exercise-mini-card__title"><?= $h($exercise['exercise_name']) ?></p>
+                    <p class="exercise-mini-card__meta">
+                      <?= count($exercise['sets']) ?> serii · max <?= $h($formatWeight($exercise['max_weight_kg'])) ?> kg
+                    </p>
+                    <p class="exercise-mini-card__meta"><?= $h(implode(' / ', $setPreview)) ?></p>
+                  </article>
+                <?php endforeach; ?>
+              </div>
+            <?php else: ?>
+              <div class="history-empty">
+                <span class="material-symbols-outlined">history</span>
+                <h2 class="workout-summary__title">Brak historii treningów</h2>
+                <p>Zacznij pierwszą sesję, a jej serie i podsumowanie pojawią się w tym miejscu.</p>
+              </div>
+            <?php endif; ?>
+          </section>
+
+          <section class="surface-card surface-card--large history-list-panel">
+            <div class="panel-header">
+              <div>
+                <span class="section-eyebrow">Dziennik</span>
+                <h2 class="panel-header__title">Zapisane treningi</h2>
+              </div>
+              <a class="btn btn--subtle" href="/session">Nowa sesja</a>
+            </div>
+
+            <?php if (empty($sessions)): ?>
+              <div class="history-empty">
+                <span class="material-symbols-outlined">add_task</span>
+                <p>Nie masz jeszcze zapisanych sesji treningowych.</p>
+              </div>
+            <?php else: ?>
+              <div class="history-session-list">
+                <?php foreach ($sessions as $index => $session): ?>
+                  <?php
+                    $sessionId = (int) $session['id'];
+                    $sessionSets = $setsBySession[$sessionId] ?? [];
+                    $exerciseGroups = $groupSetsByExercise($sessionSets);
+                    $status = (string) ($session['status'] ?? 'planned');
+                  ?>
+                  <details class="history-session-card" <?= $index === 0 ? 'open' : '' ?>>
+                    <summary class="history-session-card__summary">
+                      <div>
+                        <span class="section-eyebrow"><?= $h($formatDate($session['started_at'] ?? null)) ?></span>
+                        <h3 class="history-session-card__title"><?= $h($session['name'] ?? 'Trening') ?></h3>
+                        <p class="records-list__meta">
+                          <?= $h($session['plan_name'] ?? 'Bez planu') ?>
+                          <?php if (!empty($session['day_name'])): ?>
+                            · <?= $h($session['day_name']) ?>
+                          <?php endif; ?>
+                        </p>
+                      </div>
+                      <div class="history-session-card__metrics">
+                        <span class="badge badge--<?= $status === 'finished' ? 'success' : 'neutral' ?>">
+                          <?= $h($statusLabels[$status] ?? $status) ?>
+                        </span>
+                        <span><?= $h($formatNumber($session['volume_kg'] ?? 0)) ?> kg</span>
+                        <span><?= (int) ($session['sets_count'] ?? 0) ?> serii</span>
+                      </div>
+                    </summary>
+
+                    <div class="history-session-card__body">
+                      <?php if (!empty($session['notes'])): ?>
+                        <p class="history-note"><?= $h($session['notes']) ?></p>
+                      <?php endif; ?>
+
+                      <?php if (empty($exerciseGroups)): ?>
+                        <p class="records-list__meta">Ta sesja nie ma jeszcze zapisanych serii.</p>
+                      <?php else: ?>
+                        <?php foreach ($exerciseGroups as $exercise): ?>
+                          <article class="history-exercise-group">
+                            <div class="history-exercise-group__header">
+                              <div>
+                                <h4><?= $h($exercise['exercise_name']) ?></h4>
+                                <p><?= $h($exercise['muscle_groups'] ?: $exercise['equipment_name']) ?></p>
+                              </div>
+                              <span class="badge badge--neutral"><?= count($exercise['sets']) ?> serii</span>
+                            </div>
+
+                            <ul class="history-set-list">
+                              <?php foreach ($exercise['sets'] as $set): ?>
+                                <?php $setType = (string) ($set['set_type'] ?? 'working'); ?>
+                                <li class="history-set-row">
+                                  <span>#<?= (int) ($set['set_order'] ?? 0) ?></span>
+                                  <strong><?= $h($formatWeight($set['weight_kg'] ?? 0)) ?> kg x <?= (int) ($set['reps'] ?? 0) ?></strong>
+                                  <span>RPE <?= ($set['rpe'] ?? null) !== null ? $h($formatNumber($set['rpe'], 1)) : 'brak' ?></span>
+                                  <span><?= $h($setTypeLabels[$setType] ?? $setType) ?></span>
+                                </li>
+                              <?php endforeach; ?>
+                            </ul>
+                          </article>
+                        <?php endforeach; ?>
+                      <?php endif; ?>
+                    </div>
+                  </details>
+                <?php endforeach; ?>
+              </div>
+            <?php endif; ?>
+          </section>
+        </div>
+
+        <aside class="history-layout__aside">
+          <section class="surface-card surface-card--medium records-card">
+            <div class="panel-header">
+              <h2 class="panel-header__title">Podsumowanie</h2>
+              <span class="material-symbols-outlined">monitoring</span>
+            </div>
+            <div class="history-stats-grid">
+              <div class="stat-chip stat-chip--primary">
+                <span class="stat-chip__label">Treningi</span>
+                <span class="stat-chip__value"><?= (int) ($summary['finished_sessions'] ?? 0) ?></span>
+              </div>
+              <div class="stat-chip stat-chip--primary">
+                <span class="stat-chip__label">Objętość</span>
+                <span class="stat-chip__value"><?= $h($formatNumber($summary['total_volume_kg'] ?? 0)) ?> kg</span>
+              </div>
+              <div class="stat-chip">
+                <span class="stat-chip__label">Serie</span>
+                <span class="stat-chip__value"><?= (int) ($summary['total_sets'] ?? 0) ?></span>
+              </div>
+              <div class="stat-chip">
+                <span class="stat-chip__label">Ćwiczenia</span>
+                <span class="stat-chip__value"><?= (int) ($summary['exercises_count'] ?? 0) ?></span>
+              </div>
+              <div class="stat-chip">
+                <span class="stat-chip__label">RPE sesji</span>
+                <span class="stat-chip__value">
+                  <?= ($summary['average_session_rpe'] ?? null) !== null ? $h($formatNumber($summary['average_session_rpe'], 1)) : 'brak' ?>
+                </span>
+              </div>
+            </div>
+            <div class="trend-card">
+              <span class="trend-card__label">Objętość ostatnich sesji</span>
+              <div class="trend-bars" aria-label="Trend objętości treningowej">
+                <?php if (empty($trendSessions)): ?>
+                  <div class="trend-bars__bar" style="height: 8%"></div>
+                <?php else: ?>
+                  <?php foreach ($trendSessions as $session): ?>
+                    <?php $height = max(8, (int) round(((float) ($session['volume_kg'] ?? 0) / $maxTrendVolume) * 100)); ?>
+                    <div class="trend-bars__bar trend-bars__bar--primary" style="height: <?= $height ?>%" title="<?= $h($formatNumber($session['volume_kg'] ?? 0)) ?> kg"></div>
+                  <?php endforeach; ?>
+                <?php endif; ?>
+              </div>
+            </div>
+          </section>
+
+          <section class="surface-card surface-card--medium records-card">
+            <div class="panel-header">
+              <h2 class="panel-header__title">Rekordy ćwiczeń</h2>
+              <span class="material-symbols-outlined icon--filled records-card__star">star</span>
+            </div>
+            <ul class="records-list">
+              <?php if (empty($records)): ?>
+                <li class="records-list__item">
+                  <p class="records-list__name">Brak rekordów</p>
+                  <p class="records-list__meta">Rekordy pojawią się po zapisaniu pierwszych serii.</p>
+                </li>
+              <?php else: ?>
+                <?php foreach ($records as $record): ?>
+                  <li class="records-list__item">
+                    <div class="records-list__row">
+                      <div>
+                        <p class="records-list__name"><?= $h($record['exercise_name']) ?></p>
+                        <p class="records-list__value records-list__value--primary">
+                          <?= $h($formatWeight($record['max_weight_kg'] ?? 0)) ?> kg
+                        </p>
+                      </div>
+                      <span class="badge badge--success"><?= (int) ($record['sets_count'] ?? 0) ?> serii</span>
+                    </div>
+                    <p class="records-list__meta">
+                      Max seria: <?= $h($formatNumber($record['max_set_volume_kg'] ?? 0)) ?> kg · <?= $h($formatDate($record['last_performed_at'] ?? null)) ?>
+                    </p>
+                  </li>
+                <?php endforeach; ?>
+              <?php endif; ?>
+            </ul>
+          </section>
+        </aside>
+      </div>
+    </main>
+
+    <footer class="site-footer site-footer--inline site-footer--spaced">
+      <div class="site-footer__meta">© 2026 Hipertrof.io. All rights reserved.</div>
+      <div class="site-footer__links">
+        <a class="site-footer__link" href="/dashboard">Dashboard</a>
+        <a class="site-footer__link" href="/planer">Planer</a>
+        <a class="site-footer__link" href="/session">Sesja</a>
+      </div>
+    </footer>
+
+    <a class="fab fab--large fab--gradient" href="/session" aria-label="Dodaj trening">
+      <span class="material-symbols-outlined fab__icon">add</span>
+    </a>
+  </body>
+</html>

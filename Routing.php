@@ -96,6 +96,18 @@ class Routing
             "controller" => "ApiController",
             "action" => "searchExercises"
         ],
+        "api/workout/start" => [
+            "controller" => "ApiController",
+            "action" => "startWorkoutSession"
+        ],
+        "api/workout/set" => [
+            "controller" => "ApiController",
+            "action" => "addWorkoutSet"
+        ],
+        "api/workout/finish" => [
+            "controller" => "ApiController",
+            "action" => "finishWorkoutSession"
+        ],
     ];
 
     public static function run(string $path): void

@@ -4,6 +4,7 @@ require_once "config.php";
 
 // singleton 
 class Database {
+    private static ?PDO $connection = null;
     private $username;
     private $password;
     private $host;
@@ -19,8 +20,12 @@ class Database {
 
     public function connect()
     {
+        if (self::$connection instanceof PDO) {
+            return self::$connection;
+        }
+
         try {
-            $conn = new PDO(
+            self::$connection = new PDO(
                 "pgsql:host=$this->host;port=5432;dbname=$this->database",
                 $this->username,
                 $this->password,
@@ -32,7 +37,7 @@ class Database {
                 ]
             );
 
-            return $conn;
+            return self::$connection;
         }
         catch(PDOException $e) {
             throw new RuntimeException("Database connection failed", 0, $e);
@@ -40,5 +45,6 @@ class Database {
     }
 
     public function disconnect() {
+        self::$connection = null;
     }
 }
