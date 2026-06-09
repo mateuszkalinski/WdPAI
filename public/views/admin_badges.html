@@ -1,0 +1,155 @@
+<?php $h = fn ($value) => htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8'); ?>
+
+<!doctype html>
+<html lang="pl">
+  <head>
+    <?php include __DIR__ . '/partials/head.html'; ?>
+    <title>Admin - odznaki</title>
+  </head>
+  <body class="app-body">
+    <?php include __DIR__ . '/partials/nav.html'; ?>
+
+    <main class="page-shell page-shell--admin">
+      <header class="page-header page-header--admin">
+        <h1 class="page-header__title page-header__title--tight">Odznaki</h1>
+        <p class="page-header__lead page-header__lead--narrow">Definicje osiągnięć, które użytkownicy mogą zdobywać podczas treningów.</p>
+      </header>
+
+      <nav class="admin-tabs" aria-label="Panel administratora">
+        <a class="admin-tabs__link" href="/admin/users">Użytkownicy</a>
+        <a class="admin-tabs__link" href="/admin/exercises">Ćwiczenia</a>
+        <a class="admin-tabs__link admin-tabs__link--active" href="/admin/badges">Odznaki</a>
+      </nav>
+
+      <?php if (!empty($messages)): ?>
+        <p class="admin-message"><?= $h($messages) ?></p>
+      <?php endif; ?>
+
+      <section class="admin-grid">
+        <form class="surface-card surface-card--large admin-form" method="POST" action="/admin/badges/create">
+          <div class="panel-header panel-header--wide">
+            <h2 class="panel-header__title">Nowa odznaka</h2>
+            <span class="material-symbols-outlined icon--filled">workspace_premium</span>
+          </div>
+
+          <label class="admin-field">
+            <span>Nazwa</span>
+            <input name="name" required maxlength="120" placeholder="np. Pierwsze 140 kg w przysiadzie">
+          </label>
+
+          <label class="admin-field">
+            <span>Opis</span>
+            <textarea name="description" required rows="4" placeholder="Za co użytkownik otrzymuje odznakę"></textarea>
+          </label>
+
+          <div class="admin-form__row">
+            <label class="admin-field">
+              <span>Ikona</span>
+              <input name="icon" maxlength="60" value="military_tech">
+            </label>
+
+            <label class="admin-field">
+              <span>Wartość celu</span>
+              <input name="target_value" required type="number" min="1" step="0.01" value="1">
+            </label>
+          </div>
+
+          <label class="admin-field">
+            <span>Typ kryterium</span>
+            <select name="criteria_type" required>
+              <option value="exercise_weight">Ciężar w ćwiczeniu</option>
+              <option value="total_sessions">Liczba treningów</option>
+              <option value="total_volume">Całkowita objętość</option>
+              <option value="muscle_sets">Serie na partię</option>
+              <option value="custom">Ręczne/custom</option>
+            </select>
+          </label>
+
+          <label class="admin-field">
+            <span>Ćwiczenie</span>
+            <select name="exercise_id">
+              <option value="">Brak</option>
+              <?php foreach (($exercises ?? []) as $exercise): ?>
+                <option value="<?= $h($exercise['id']) ?>"><?= $h($exercise['name']) ?></option>
+              <?php endforeach; ?>
+            </select>
+          </label>
+
+          <label class="admin-field">
+            <span>Partia mięśniowa</span>
+            <select name="muscle_group_id">
+              <option value="">Brak</option>
+              <?php foreach (($muscleGroups ?? []) as $group): ?>
+                <option value="<?= $h($group['id']) ?>"><?= $h($group['name']) ?></option>
+              <?php endforeach; ?>
+            </select>
+          </label>
+
+          <button class="btn btn--primary" type="submit">Dodaj odznakę</button>
+        </form>
+
+        <section class="surface-card surface-card--large admin-panel">
+          <div class="panel-header panel-header--wide">
+            <h2 class="panel-header__title">Lista odznak</h2>
+            <span class="badge badge--neutral"><?= count($badges ?? []) ?> pozycji</span>
+          </div>
+
+          <div class="admin-table-wrap">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Odznaka</th>
+                  <th>Kryterium</th>
+                  <th>Cel</th>
+                  <th>Powiązanie</th>
+                  <th>Zdobycia</th>
+                  <th>Status</th>
+                  <th>Akcje</th>
+                </tr>
+              </thead>
+              <tbody>
+                <?php foreach (($badges ?? []) as $badge): ?>
+                  <tr>
+                    <td>
+                      <strong><?= $h($badge['name']) ?></strong>
+                      <span class="admin-table__muted">
+                        <span class="material-symbols-outlined admin-table__icon"><?= $h($badge['icon']) ?></span>
+                        <?= $h($badge['slug']) ?>
+                      </span>
+                    </td>
+                    <td><?= $h($badge['criteria_type']) ?></td>
+                    <td><?= $h($badge['target_value']) ?></td>
+                    <td>
+                      <?= $h($badge['exercise_name'] ?? $badge['muscle_group_name'] ?? '-') ?>
+                    </td>
+                    <td><?= $h($badge['awarded_count']) ?></td>
+                    <td>
+                      <?php if ($badge['is_active']): ?>
+                        <span class="badge badge--success">Aktywna</span>
+                      <?php else: ?>
+                        <span class="badge badge--neutral">Ukryta</span>
+                      <?php endif; ?>
+                    </td>
+                    <td>
+                      <?php if ($badge['is_active']): ?>
+                        <form method="POST" action="/admin/badges/deactivate">
+                          <input type="hidden" name="id" value="<?= $h($badge['id']) ?>">
+                          <button class="icon-button icon-button--soft material-symbols-outlined" type="submit" aria-label="Ukryj">visibility_off</button>
+                        </form>
+                      <?php else: ?>
+                        <form method="POST" action="/admin/badges/activate">
+                          <input type="hidden" name="id" value="<?= $h($badge['id']) ?>">
+                          <button class="icon-button icon-button--soft material-symbols-outlined" type="submit" aria-label="Aktywuj">visibility</button>
+                        </form>
+                      <?php endif; ?>
+                    </td>
+                  </tr>
+                <?php endforeach; ?>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+    </main>
+  </body>
+</html>

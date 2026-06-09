@@ -14,6 +14,9 @@
       <a class="<?= ($currentTab === 'session') ? $activeClass : $inactiveClass ?>" href="/session"><strong>Rozpocznij trening!</strong></a>
       <a class="<?= ($currentTab === 'atlas') ? $activeClass : $inactiveClass ?>" href="/atlas">Atlas</a>
       <a class="<?= ($currentTab === 'history') ? $activeClass : $inactiveClass ?>" href="/history">Historia</a>
+      <?php if (($_SESSION['role'] ?? null) === 'admin'): ?>
+        <a class="<?= ($currentTab === 'admin') ? $activeClass : $inactiveClass ?>" href="/admin/users">Admin</a>
+      <?php endif; ?>
     </div>
   </div>
 

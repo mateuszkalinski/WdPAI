@@ -2,6 +2,7 @@
 
 require_once 'AppController.php';
 require_once __DIR__.'/../repositories/UsersRepository.php';
+require_once __DIR__.'/../repositories/ExerciseRepository.php';
 
 class DashboardController extends AppController
 {
@@ -34,7 +35,14 @@ class DashboardController extends AppController
     public function atlas(): void
     {
         $this->requireLogin();
-        $this->render("atlas", ["activeTab" => "atlas"]);
+
+        $exerciseRepository = new ExerciseRepository();
+
+        $this->render("atlas", [
+            "activeTab" => "atlas",
+            "exercises" => $exerciseRepository->getActiveExercises(),
+            "muscleGroups" => $exerciseRepository->getMuscleGroups()
+        ]);
     }
 
     public function history(): void

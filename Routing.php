@@ -2,6 +2,8 @@
 
 require_once 'src/controllers/SecurityController.php';
 require_once 'src/controllers/DashboardController.php';
+require_once 'src/controllers/AdminController.php';
+require_once 'src/controllers/ApiController.php';
 
 class Routing
 {
@@ -41,6 +43,58 @@ class Routing
         "history" => [
             "controller" => "DashboardController",
             "action" => "history"
+        ],
+        "admin/users" => [
+            "controller" => "AdminController",
+            "action" => "users"
+        ],
+        "admin/users/block" => [
+            "controller" => "AdminController",
+            "action" => "blockUser"
+        ],
+        "admin/users/unblock" => [
+            "controller" => "AdminController",
+            "action" => "unblockUser"
+        ],
+        "admin/users/delete" => [
+            "controller" => "AdminController",
+            "action" => "deleteUser"
+        ],
+        "admin/exercises" => [
+            "controller" => "AdminController",
+            "action" => "exercises"
+        ],
+        "admin/exercises/create" => [
+            "controller" => "AdminController",
+            "action" => "createExercise"
+        ],
+        "admin/exercises/deactivate" => [
+            "controller" => "AdminController",
+            "action" => "deactivateExercise"
+        ],
+        "admin/exercises/activate" => [
+            "controller" => "AdminController",
+            "action" => "activateExercise"
+        ],
+        "admin/badges" => [
+            "controller" => "AdminController",
+            "action" => "badges"
+        ],
+        "admin/badges/create" => [
+            "controller" => "AdminController",
+            "action" => "createBadge"
+        ],
+        "admin/badges/deactivate" => [
+            "controller" => "AdminController",
+            "action" => "deactivateBadge"
+        ],
+        "admin/badges/activate" => [
+            "controller" => "AdminController",
+            "action" => "activateBadge"
+        ],
+        "api/exercises/search" => [
+            "controller" => "ApiController",
+            "action" => "searchExercises"
         ],
     ];
 
