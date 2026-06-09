@@ -3,18 +3,24 @@
 require_once 'src/controllers/SecurityController.php';
 require_once 'src/controllers/DashboardController.php';
 
-// TODO musimy zapewnic, ze utworzony 
-// obiekt kontrollera ma tylko jedna instancję - SINGLETON
-
-// TODO 2 /dashboard -- wszystkei dnae
-// /dashboard/12234 -- wyciagnie nam jakis elemtn o wskaznaym ID 12234
-// REGEX
-class Routing {
-
-    public static $routes = [
+class Routing
+{
+    public static array $routes = [
+        "" => [
+            "controller" => "SecurityController",
+            "action" => "login"
+        ],
         "login" => [
             "controller" => "SecurityController",
             "action" => "login"
+        ],
+        "logout" => [
+            "controller" => "SecurityController",
+            "action" => "logout"
+        ],
+        "register" => [
+            "controller" => "SecurityController",
+            "action" => "register"
         ],
         "dashboard" => [
             "controller" => "DashboardController",
@@ -36,38 +42,20 @@ class Routing {
             "controller" => "DashboardController",
             "action" => "history"
         ],
-        "" => [
-            "controller" => "SecurityController",
-            "action" => "login"
-        ],
-        "register" => [
-            "controller" => "SecurityController",
-            "action" => "register"
-        ],
     ];
 
-    public static function run(string $path) {
-        // TODO sprawdzać za pomoca array_key_exists
-        switch($path) {
-            case 'dashboard':
-            case 'planer':   // <-- DODANE
-            case 'session':  // <-- DODANE
-            case 'atlas':    // <-- DODANE
-            case 'history':  // <-- DODANE
-            case '':
-            case 'login':
-            case 'register':
-                $controller = Routing::$routes[$path]["controller"];
-                $action = Routing::$routes[$path]["action"];
-
-                $controllerObj = new $controller;
-                $id = null;
-
-                $controllerObj->$action($id);
-                break; 
-            default:
-                include 'public/views/404.html';
-                break;
+    public static function run(string $path): void
+    {
+        if (!array_key_exists($path, self::$routes)) {
+            http_response_code(404);
+            include 'public/views/404.html';
+            return;
         }
+
+        $controller = self::$routes[$path]["controller"];
+        $action = self::$routes[$path]["action"];
+
+        $controllerObj = new $controller;
+        $controllerObj->$action();
     }
 }

@@ -1,8 +1,6 @@
 <?php
   $activeClass = "site-nav__link site-nav__link--active";
   $inactiveClass = "site-nav__link";
-
-  // Zabezpieczenie: jeśli z jakiegoś powodu activeTab nie istnieje, domyślnie jest puste
   $currentTab = $activeTab ?? '';
 ?>
 
@@ -17,11 +15,11 @@
       <a class="<?= ($currentTab === 'atlas') ? $activeClass : $inactiveClass ?>" href="/atlas">Atlas</a>
       <a class="<?= ($currentTab === 'history') ? $activeClass : $inactiveClass ?>" href="/history">Historia</a>
     </div>
-
   </div>
+
   <div class="site-nav__actions">
-    <button class="site-nav__profile-button" type="button" aria-label="Profil użytkownika">
-      <span class="material-symbols-outlined site-nav__profile-icon">account_circle</span>
-    </button>
+    <a class="site-nav__profile-button" href="/logout" aria-label="Wyloguj">
+      <span class="material-symbols-outlined site-nav__profile-icon">logout</span>
+    </a>
   </div>
 </nav>
