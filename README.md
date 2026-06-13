@@ -297,51 +297,6 @@ public/scripts/atlas.js
 public/scripts/session.js
 ```
 
-## Scenariusz testowy ręczny
-
-1. Wejdź na `http://localhost:8080`.
-2. Zaloguj się jako `user@wdpai.com` / `wdpai123`.
-3. Sprawdź dashboard.
-4. Przejdź do planera.
-5. Wybierz gotowy plan albo utwórz własny plan od zera.
-6. Dodaj ćwiczenie do wybranego dnia planu.
-7. Wejdź w tryb edycji planu.
-8. Zmień kolejność ćwiczeń.
-9. Zmień liczbę serii lub zakres powtórzeń.
-10. Zapisz zmiany.
-11. Przejdź do `Rozpocznij trening`.
-12. Rozpocznij sesję.
-13. Zapisz serię z ciężarem i powtórzeniami.
-14. Opcjonalnie wpisz RPE dla serii.
-15. Pomiń serię lub ćwiczenie.
-16. Zakończ trening i potwierdź modal.
-17. Przejdź do historii i sprawdź zapisany trening.
-18. Przejdź do atlasu i wyszukaj ćwiczenie.
-19. Wyloguj się.
-
-Scenariusz uprawnień:
-
-1. Zaloguj się jako `user@wdpai.com`.
-2. Wejdź na `/admin/users`.
-3. Oczekiwany wynik: `403`.
-4. Wyloguj się.
-5. Zaloguj się jako `admin@hipertrof.io`.
-6. Wejdź na `/admin/users`.
-7. Zablokuj lub odblokuj użytkownika.
-8. Wejdź na `/admin/exercises`.
-9. Aktywuj lub dezaktywuj ćwiczenie.
-10. Wejdź na `/admin/badges`.
-11. Dodaj lub ukryj odznakę.
-
-Scenariusz błędów:
-
-1. Wejdź na `/dashboard` bez logowania.
-2. Oczekiwany wynik: przekierowanie do logowania albo `401`.
-3. Wejdź jako zwykły użytkownik na `/admin/users`.
-4. Oczekiwany wynik: `403`.
-5. Wykonaj kilka błędnych logowań.
-6. Oczekiwany wynik: po przekroczeniu limitu aplikacja zwraca `429`.
-
 ## Testy automatyczne
 
 Smoke test PowerShell:
@@ -376,16 +331,6 @@ Diagram ERD znajduje się w folderze dokumentacji:
 - [ERD.png](<Dokumentacja i wymagania/ERD.png>)
 
 ![Diagram ERD](<Dokumentacja i wymagania/ERD.png>)
-
-Proponowany zakres diagramu:
-
-- użytkownicy i role
-- profile użytkowników
-- plany treningowe, dni planu i ćwiczenia planu
-- ćwiczenia, sprzęt i partie mięśniowe
-- sesje treningowe i wykonane serie
-- odznaki użytkowników
-- próby logowania
 
 ## Screeny aplikacji
 
