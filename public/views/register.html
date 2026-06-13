@@ -1,27 +1,30 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="pl">
   <head>
     <?php include __DIR__ . '/partials/head.html'; ?>
+    <title>Rejestracja | Hipertrof.io</title>
     <script src="/public/scripts/validate.js" defer></script>
   </head>
   <body class="auth-page">
-    <form class="auth-form" method="POST" action="/register">
-      <h1 class="auth-form__title">REGISTER FORM</h1>
+    <form class="auth-form" method="POST" action="/register" novalidate>
+      <h1 class="auth-form__title">Rejestracja</h1>
+      <input type="hidden" name="_csrf_token" value="<?= htmlspecialchars($csrfToken ?? '', ENT_QUOTES, 'UTF-8') ?>" />
 
-      <?php if(isset($messages)): ?>
-
-      <p class="auth-form__messages">
-        <?= htmlspecialchars($messages, ENT_QUOTES, 'UTF-8') ?>
-      </p>
-
+      <?php if (isset($messages)): ?>
+        <p class="auth-form__messages">
+          <?= htmlspecialchars($messages, ENT_QUOTES, 'UTF-8') ?>
+        </p>
       <?php endif; ?>
-      <input class="auth-form__field" name="email" type="email" placeholder="Twój email" />
-      <input class="auth-form__field" name="password" type="password" placeholder="Twoje hasło" />
-      <input class="auth-form__field" name="password2" type="password" placeholder="Powtórz hasło" />
-      <input class="auth-form__field" name="username" type="text" placeholder="Nazwa użytkownika (nick)" />
-      <input class="auth-form__field" name="firstName" type="text" placeholder="Imie" />
-      <input class="auth-form__field" name="lastName" type="text" placeholder="Nazwisko" />
-      <button class="btn btn--primary auth-form__submit" type="submit">REGISTER</button>
+
+      <input class="auth-form__field" name="email" type="email" placeholder="Twój e-mail" autocomplete="email" maxlength="100" required />
+      <input class="auth-form__field" name="password" type="password" placeholder="Hasło" autocomplete="new-password" maxlength="255" required />
+      <input class="auth-form__field" name="password2" type="password" placeholder="Powtórz hasło" autocomplete="new-password" maxlength="255" required />
+      <input class="auth-form__field" name="username" type="text" placeholder="Nazwa użytkownika" autocomplete="username" maxlength="50" required />
+      <input class="auth-form__field" name="firstName" type="text" placeholder="Imię" autocomplete="given-name" maxlength="80" required />
+      <input class="auth-form__field" name="lastName" type="text" placeholder="Nazwisko" autocomplete="family-name" maxlength="80" required />
+      <button class="btn btn--primary auth-form__submit" type="submit">Zarejestruj</button>
+
+      <a class="auth-form__link" href="/login">Mam już konto</a>
     </form>
   </body>
 </html>

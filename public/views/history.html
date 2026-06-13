@@ -10,6 +10,11 @@
       return rtrim(rtrim($formatted, '0'), ',');
   };
 
+  $formatRpe = function ($value): string {
+      $formatted = number_format((float) $value, 1, ',', ' ');
+      return rtrim(rtrim($formatted, '0'), ',');
+  };
+
   $dateFromValue = function ($value): ?DateTimeImmutable {
       if (empty($value)) {
           return null;
@@ -90,12 +95,6 @@
       'finished' => 'zakończony',
       'cancelled' => 'odwołany'
   ];
-  $setTypeLabels = [
-      'warmup' => 'rozgrzewka',
-      'working' => 'robocza',
-      'drop' => 'drop',
-      'failure' => 'do upadku'
-  ];
   $monthNames = [
       1 => 'styczeń',
       2 => 'luty',
@@ -128,7 +127,8 @@
   $monthTitle = ucfirst($monthNames[(int) $monthStart->format('n')]).' '.$monthStart->format('Y');
 
   $trendSessions = array_reverse(array_slice($sessions, 0, 7));
-  $maxTrendVolume = max(1, ...array_map(fn($session) => (float) ($session['volume_kg'] ?? 0), $trendSessions));
+  $trendVolumes = array_map(fn($session) => (float) ($session['volume_kg'] ?? 0), $trendSessions);
+  $maxTrendVolume = empty($trendVolumes) ? 1 : max(1, max($trendVolumes));
 ?>
 <!doctype html>
 <html lang="pl">
@@ -322,12 +322,12 @@
 
                             <ul class="history-set-list">
                               <?php foreach ($exercise['sets'] as $set): ?>
-                                <?php $setType = (string) ($set['set_type'] ?? 'working'); ?>
                                 <li class="history-set-row">
                                   <span>#<?= (int) ($set['set_order'] ?? 0) ?></span>
                                   <strong><?= $h($formatWeight($set['weight_kg'] ?? 0)) ?> kg x <?= (int) ($set['reps'] ?? 0) ?></strong>
-                                  <span>RPE <?= ($set['rpe'] ?? null) !== null ? $h($formatNumber($set['rpe'], 1)) : 'brak' ?></span>
-                                  <span><?= $h($setTypeLabels[$setType] ?? $setType) ?></span>
+                                  <?php if (($set['rpe'] ?? null) !== null): ?>
+                                    <span>RPE <?= $h($formatRpe($set['rpe'])) ?></span>
+                                  <?php endif; ?>
                                 </li>
                               <?php endforeach; ?>
                             </ul>
@@ -364,12 +364,6 @@
               <div class="stat-chip">
                 <span class="stat-chip__label">Ćwiczenia</span>
                 <span class="stat-chip__value"><?= (int) ($summary['exercises_count'] ?? 0) ?></span>
-              </div>
-              <div class="stat-chip">
-                <span class="stat-chip__label">RPE sesji</span>
-                <span class="stat-chip__value">
-                  <?= ($summary['average_session_rpe'] ?? null) !== null ? $h($formatNumber($summary['average_session_rpe'], 1)) : 'brak' ?>
-                </span>
               </div>
             </div>
             <div class="trend-card">
@@ -422,17 +416,5 @@
       </div>
     </main>
 
-    <footer class="site-footer site-footer--inline site-footer--spaced">
-      <div class="site-footer__meta">© 2026 Hipertrof.io. All rights reserved.</div>
-      <div class="site-footer__links">
-        <a class="site-footer__link" href="/dashboard">Dashboard</a>
-        <a class="site-footer__link" href="/planer">Planer</a>
-        <a class="site-footer__link" href="/session">Sesja</a>
-      </div>
-    </footer>
-
-    <a class="fab fab--large fab--gradient" href="/session" aria-label="Dodaj trening">
-      <span class="material-symbols-outlined fab__icon">add</span>
-    </a>
   </body>
 </html>

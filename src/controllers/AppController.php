@@ -35,10 +35,36 @@ class AppController
         }
     }
 
+    protected function getCsrfToken(): string
+    {
+        if (empty($_SESSION['csrf_token'])) {
+            $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+        }
+
+        return $_SESSION['csrf_token'];
+    }
+
+    protected function isValidCsrfToken(?string $token): bool
+    {
+        return is_string($token)
+            && isset($_SESSION['csrf_token'])
+            && hash_equals($_SESSION['csrf_token'], $token);
+    }
+
+    protected function requireCsrf(): void
+    {
+        $token = $_POST['_csrf_token'] ?? ($_SERVER['HTTP_X_CSRF_TOKEN'] ?? null);
+
+        if (!$this->isValidCsrfToken($token)) {
+            http_response_code(400);
+            $this->render('400');
+            exit();
+        }
+    }
+
     protected function redirect(string $path): void
     {
-        $url = "http://$_SERVER[HTTP_HOST]";
-        header("Location: {$url}{$path}");
+        header("Location: {$path}");
         exit();
     }
 
@@ -47,6 +73,7 @@ class AppController
         $templatePath = 'public/views/'. $template.'.html';
         $templatePath404 = 'public/views/404.html';
         $output = "";
+        $variables['csrfToken'] = $variables['csrfToken'] ?? $this->getCsrfToken();
 
         if (file_exists($templatePath)) {
             extract($variables);

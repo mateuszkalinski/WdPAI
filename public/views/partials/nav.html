@@ -4,11 +4,11 @@
   $currentTab = $activeTab ?? '';
 ?>
 
-<nav class="site-nav">
+<nav class="site-nav" data-site-nav>
   <div class="site-nav__brand-group">
     <span class="site-nav__brand">Hipertrof.io</span>
 
-    <div class="site-nav__links">
+    <div class="site-nav__links" id="site-nav-menu" data-site-nav-menu>
       <a class="<?= ($currentTab === 'dashboard') ? $activeClass : $inactiveClass ?>" href="/dashboard">Dashboard</a>
       <a class="<?= ($currentTab === 'planer') ? $activeClass : $inactiveClass ?>" href="/planer">Planer</a>
       <a class="<?= ($currentTab === 'session') ? $activeClass : $inactiveClass ?>" href="/session"><strong>Rozpocznij trening!</strong></a>
@@ -21,6 +21,17 @@
   </div>
 
   <div class="site-nav__actions">
+    <button
+      class="site-nav__menu-button"
+      type="button"
+      aria-label="Otwórz menu"
+      aria-controls="site-nav-menu"
+      aria-expanded="false"
+      data-site-nav-toggle
+    >
+      <span class="material-symbols-outlined site-nav__menu-icon" data-menu-icon>menu</span>
+    </button>
+
     <a class="site-nav__profile-button" href="/logout" aria-label="Wyloguj">
       <span class="material-symbols-outlined site-nav__profile-icon">logout</span>
     </a>

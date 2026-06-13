@@ -37,6 +37,13 @@
   $totalWeeklySets = array_sum(array_map(fn($row) => (int) ($row['sets_count'] ?? 0), $weeklyMuscles));
   $ringScore = $totalWeeklySets > 0 ? min(100, (int) round(((int) ($weeklyMuscles[0]['sets_count'] ?? 0) / $totalWeeklySets) * 100)) : 0;
   $muscleDots = ['primary', 'secondary', 'tertiary', 'muted'];
+  $statusLabels = [
+      'planned' => 'PLANOWANA',
+      'in_progress' => 'W TRAKCIE',
+      'finished' => 'ZAKOŃCZONA',
+      'cancelled' => 'ANULOWANA',
+      'draft' => 'ROBOCZA'
+  ];
 ?>
 <!doctype html>
 <html lang="pl">
@@ -64,24 +71,16 @@
             </div>
             <div class="dashboard-stat__summary">
               <span class="dashboard-stat__value dashboard-stat__value--primary"><?= $finishedSessions ?></span>
-              <span class="metric-trend">
-                <span class="material-symbols-outlined metric-trend__icon">event_available</span>
-                DB
-              </span>
             </div>
           </section>
 
           <section class="surface-card surface-card--large surface-card--interactive dashboard-stat">
             <div>
               <span class="section-eyebrow">Wykonane serie</span>
-              <h2 class="dashboard-stat__title">Serie i średnie RPE</h2>
+              <h2 class="dashboard-stat__title">Wykonane serie</h2>
             </div>
             <div class="dashboard-stat__summary">
               <span class="dashboard-stat__value"><?= $totalSets ?></span>
-              <span class="metric-trend">
-                <span class="material-symbols-outlined metric-trend__icon">speed</span>
-                RPE <?= $averageRpe !== null ? $h($formatNumber($averageRpe, 1)) : 'brak' ?>
-              </span>
             </div>
           </section>
 
@@ -236,7 +235,7 @@
                         <p class="records-list__value"><?= $h($formatNumber($session['volume_kg'] ?? 0)) ?> kg</p>
                       </div>
                       <span class="badge badge--<?= ($session['status'] ?? '') === 'finished' ? 'success' : 'neutral' ?>">
-                        <?= $h($session['status'] ?? 'draft') ?>
+                        <?= $h($statusLabels[$session['status'] ?? 'draft'] ?? strtoupper((string) ($session['status'] ?? 'draft'))) ?>
                       </span>
                     </div>
                     <p class="records-list__meta">
@@ -262,16 +261,15 @@
               <?php else: ?>
                 <?php foreach ($badges as $badge): ?>
                   <li class="records-list__item">
-                    <div class="records-list__row">
-                      <div>
-                        <p class="records-list__name"><?= $h($badge['badge_name']) ?></p>
-                        <p class="records-list__value records-list__value--primary">
-                          <?= $h($formatNumber($badge['current_value'] ?? 0)) ?>
-                        </p>
+                    <div class="records-list__row records-list__row--badge">
+                      <div class="badge-award">
+                        <span class="material-symbols-outlined icon--filled badge-award__icon"><?= $h($badge['icon'] ?? 'military_tech') ?></span>
+                        <div>
+                          <p class="records-list__name"><?= $h($badge['badge_name']) ?></p>
+                          <p class="records-list__meta"><?= $h($formatDate($badge['awarded_at'] ?? null)) ?></p>
+                        </div>
                       </div>
-                      <span class="badge badge--primary"><?= $h($badge['criteria_type']) ?></span>
                     </div>
-                    <p class="records-list__meta"><?= $h($formatDate($badge['awarded_at'] ?? null)) ?></p>
                   </li>
                 <?php endforeach; ?>
               <?php endif; ?>
@@ -281,21 +279,5 @@
       </div>
     </main>
 
-    <footer class="site-footer site-footer--spaced">
-      <div class="site-footer__inner">
-        <div class="site-footer__meta-group">
-          <span class="site-footer__meta">© 2026 Hipertrof.io. All rights reserved.</span>
-        </div>
-        <div class="site-footer__links">
-          <a class="site-footer__link" href="/dashboard">Dashboard</a>
-          <a class="site-footer__link" href="/planer">Planer</a>
-          <a class="site-footer__link" href="/history">Historia</a>
-        </div>
-      </div>
-    </footer>
-
-    <a class="fab fab--large fab--gradient" href="/session" aria-label="Rozpocznij trening">
-      <span class="material-symbols-outlined fab__icon">add</span>
-    </a>
   </body>
 </html>

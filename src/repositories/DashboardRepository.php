@@ -81,7 +81,7 @@ class DashboardRepository extends Repository
                 wp.name AS plan_name,
                 wpd.name AS day_name,
                 COUNT(ps.id) AS sets_count,
-                calculate_session_volume(ws.id) AS volume_kg
+                COALESCE(SUM(ps.weight_kg * ps.reps), 0)::NUMERIC(12,2) AS volume_kg
             FROM workout_sessions ws
             LEFT JOIN workout_plans wp ON wp.id = ws.workout_plan_id
             LEFT JOIN workout_plan_days wpd ON wpd.id = ws.workout_plan_day_id
@@ -111,7 +111,7 @@ class DashboardRepository extends Repository
                 ws.finished_at,
                 ws.session_rpe,
                 COUNT(ps.id) AS sets_count,
-                calculate_session_volume(ws.id) AS volume_kg
+                COALESCE(SUM(ps.weight_kg * ps.reps), 0)::NUMERIC(12,2) AS volume_kg
             FROM workout_sessions ws
             LEFT JOIN performed_sets ps ON ps.workout_session_id = ws.id
             WHERE ws.user_id = :user_id
@@ -132,14 +132,13 @@ class DashboardRepository extends Repository
         $query = $this->database->connect()->prepare(
             "
             SELECT
-                badge_name,
-                criteria_type,
-                target_value,
-                current_value,
-                awarded_at,
-                source_session
-            FROM user_badge_overview
-            WHERE user_id = :user_id
+                overview.badge_name,
+                badges.icon,
+                overview.awarded_at,
+                overview.source_session
+            FROM user_badge_overview overview
+            JOIN badges ON badges.id = overview.badge_id
+            WHERE overview.user_id = :user_id
             ORDER BY awarded_at DESC
             LIMIT :limit;
             "

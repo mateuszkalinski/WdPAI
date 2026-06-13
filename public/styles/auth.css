@@ -1,0 +1,107 @@
+﻿.home-layout {
+  display: grid;
+  width: min(100% - 2rem, 72rem);
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  margin-inline: auto;
+  padding: 8rem 0 4rem;
+}
+
+.home-layout__main,
+.home-layout__aside,
+.home-layout__footer {
+  border-radius: var(--radius-xl);
+  background: var(--color-surface-lowest);
+  padding: 2rem;
+  box-shadow: var(--shadow-card);
+}
+
+.home-layout__title {
+  margin-bottom: 1rem;
+  font-size: 2rem;
+}
+
+.home-layout__user-field {
+  display: inline-block;
+  margin-right: 0.5rem;
+}
+
+.auth-page,
+.error-page {
+  display: grid;
+  min-height: 100vh;
+  place-items: center;
+  padding: 1rem;
+}
+
+.auth-form {
+  display: grid;
+  width: min(100%, 28rem);
+  gap: 1rem;
+  border-radius: var(--radius-xl);
+  background: var(--color-surface-lowest);
+  padding: 2rem;
+  box-shadow: var(--shadow-card);
+}
+
+.auth-form__title {
+  font-size: 2rem;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.auth-form__messages {
+  border-radius: var(--radius-md);
+  background: rgba(186, 26, 26, 0.08);
+  color: var(--color-error);
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+}
+
+.auth-form__field {
+  width: 100%;
+  border: 1px solid var(--color-outline-variant);
+  border-radius: var(--radius-md);
+  background: #ffffff;
+  color: var(--color-on-surface);
+  padding: 0.875rem 1rem;
+}
+
+.auth-form__field:focus {
+  border-color: var(--color-primary);
+  outline: 0;
+  box-shadow: 0 0 0 3px rgba(0, 91, 191, 0.16);
+}
+
+.auth-form__field--invalid {
+  border-color: var(--color-error);
+  color: var(--color-error);
+}
+
+.auth-form__field--invalid:focus {
+  box-shadow: 0 0 0 3px rgba(186, 26, 26, 0.16);
+}
+
+.auth-form__field-error {
+  margin-top: -0.65rem;
+  color: var(--color-error);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.auth-form__submit {
+  margin-top: 0.5rem;
+}
+
+.auth-form__link {
+  justify-self: center;
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
+.error-page__title {
+  color: var(--color-primary);
+  font-size: clamp(4rem, 20vw, 10rem);
+  font-weight: 900;
+}
+

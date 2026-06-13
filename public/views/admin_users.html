@@ -4,7 +4,7 @@
 <html lang="pl">
   <head>
     <?php include __DIR__ . '/partials/head.html'; ?>
-    <title>Admin - użytkownicy</title>
+    <title>Admin - użytkownicy | Hipertrof.io</title>
   </head>
   <body class="app-body">
     <?php include __DIR__ . '/partials/nav.html'; ?>
@@ -68,16 +68,19 @@
                       <?php if (!$isCurrentUser && $user['role'] !== 'admin'): ?>
                         <?php if ($user['is_active']): ?>
                           <form method="POST" action="/admin/users/block">
+                            <input type="hidden" name="_csrf_token" value="<?= $h($csrfToken ?? '') ?>">
                             <input type="hidden" name="id" value="<?= $h($user['id']) ?>">
                             <button class="icon-button icon-button--soft material-symbols-outlined" type="submit" aria-label="Zablokuj">lock</button>
                           </form>
                         <?php else: ?>
                           <form method="POST" action="/admin/users/unblock">
+                            <input type="hidden" name="_csrf_token" value="<?= $h($csrfToken ?? '') ?>">
                             <input type="hidden" name="id" value="<?= $h($user['id']) ?>">
                             <button class="icon-button icon-button--soft material-symbols-outlined" type="submit" aria-label="Odblokuj">lock_open</button>
                           </form>
                         <?php endif; ?>
                         <form method="POST" action="/admin/users/delete">
+                          <input type="hidden" name="_csrf_token" value="<?= $h($csrfToken ?? '') ?>">
                           <input type="hidden" name="id" value="<?= $h($user['id']) ?>">
                           <button class="icon-button icon-button--soft material-symbols-outlined" type="submit" aria-label="Usuń">delete</button>
                         </form>

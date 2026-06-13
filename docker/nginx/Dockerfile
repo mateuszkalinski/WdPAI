@@ -1,4 +1,4 @@
-FROM nginx:1.17.8-alpine
+FROM nginx:stable-alpine
 
 COPY . /app/
 COPY ./docker/nginx/nginx.conf /etc/nginx/conf.d/default.conf

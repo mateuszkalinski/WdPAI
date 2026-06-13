@@ -52,7 +52,7 @@ class HistoryRepository extends Repository
                 COUNT(ps.id) AS sets_count,
                 COUNT(DISTINCT ps.exercise_id) AS exercises_count,
                 ROUND(AVG(ps.rpe), 2) AS average_set_rpe,
-                calculate_session_volume(ws.id) AS volume_kg,
+                COALESCE(SUM(ps.weight_kg * ps.reps), 0)::NUMERIC(12,2) AS volume_kg,
                 CASE
                     WHEN ws.finished_at IS NULL THEN NULL
                     ELSE ROUND(EXTRACT(EPOCH FROM (ws.finished_at - ws.started_at)) / 60)::INTEGER

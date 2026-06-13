@@ -1,0 +1,71 @@
+﻿.page-shell {
+  width: min(100% - 2rem, 80rem);
+  margin-inline: auto;
+  padding: 8rem 0 5rem;
+}
+
+.page-shell--planner {
+  width: min(100% - 2rem, 100rem);
+  min-height: 100vh;
+  padding-top: 7rem;
+  padding-bottom: 3rem;
+}
+
+.page-shell--session {
+  width: min(100% - 2rem, 56rem);
+  padding-bottom: 6rem;
+}
+
+.page-shell--dashboard,
+.page-shell--history,
+.page-shell--atlas {
+  max-width: 80rem;
+}
+
+.page-header {
+  margin-bottom: 3rem;
+}
+
+.page-header--spacious {
+  margin-bottom: 4rem;
+}
+
+.page-header__title {
+  color: var(--color-on-surface);
+  font-size: clamp(2.5rem, 6vw, 3.5rem);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: 0;
+}
+
+.page-header__title--tight {
+  line-height: 1;
+}
+
+.page-header__lead {
+  margin-top: 0.5rem;
+  color: var(--color-on-surface-variant);
+  font-size: 1.125rem;
+  line-height: 1.6;
+}
+
+.page-header__lead--narrow {
+  max-width: 42rem;
+}
+
+.section-eyebrow {
+  display: block;
+  color: var(--color-on-surface-variant);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.section-eyebrow--primary {
+  color: var(--color-primary);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+

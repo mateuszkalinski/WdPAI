@@ -1,0 +1,420 @@
+﻿@media (min-width: 768px) {
+  .page-shell {
+    width: min(100% - 4rem, 80rem);
+  }
+
+  .page-shell--planner {
+    width: min(100% - 4rem, 100rem);
+  }
+
+  .site-nav__links {
+    display: flex;
+    position: static;
+    flex-direction: row;
+    align-items: center;
+    gap: 1.5rem;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    padding: 0;
+    backdrop-filter: none;
+  }
+
+  .site-nav__link {
+    width: auto;
+    min-height: auto;
+    border-radius: 0;
+    padding: 0;
+  }
+
+  .site-nav__link--active {
+    background: transparent;
+    border-bottom: 2px solid var(--color-primary);
+    padding-block: 0.25rem;
+  }
+
+  .site-nav__menu-button {
+    display: none;
+  }
+
+  .site-footer--inline,
+  .site-footer__inner {
+    flex-direction: row;
+  }
+
+  .dashboard-grid__main {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .dashboard-muscle-card {
+    grid-column: span 2;
+  }
+
+  .muscle-focus {
+    flex-direction: row;
+  }
+
+  .workout-summary__header {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .workout-summary__exercises {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .planner-layout {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+  }
+
+  .planner-layout__library {
+    grid-column: span 4;
+  }
+
+  .planner-layout__board {
+    grid-column: span 8;
+  }
+
+  .planner-layout__tracker {
+    grid-column: span 12;
+  }
+
+  .session-header {
+    flex-direction: row;
+    align-items: flex-end;
+  }
+
+  .session-timer {
+    align-self: auto;
+  }
+
+  .sticky-action--session {
+    grid-template-columns: 1fr 14rem;
+    align-items: end;
+  }
+
+  .search-box__shortcut {
+    display: inline-flex;
+  }
+
+  .exercise-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .home-layout {
+    grid-template-columns: 2fr 1fr;
+  }
+
+  .home-layout__footer {
+    grid-column: 1 / -1;
+  }
+
+  .admin-form__row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .dashboard-grid {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+  }
+
+  .dashboard-grid__main {
+    grid-column: span 8;
+  }
+
+  .dashboard-grid__sidebar {
+    grid-column: span 4;
+  }
+
+  .history-layout {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+  }
+
+  .history-layout__main {
+    grid-column: span 8;
+  }
+
+  .history-layout__aside {
+    grid-column: span 4;
+  }
+
+  .session-layout {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+  }
+
+  .session-layout__main {
+    grid-column: span 7;
+  }
+
+  .session-layout__aside {
+    grid-column: span 5;
+  }
+
+  .exercise-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .admin-grid {
+    grid-template-columns: minmax(20rem, 0.85fr) minmax(0, 1.6fr);
+    align-items: start;
+  }
+}
+
+@media (min-width: 1180px) {
+  .planner-layout__library,
+  .planner-layout__tracker {
+    grid-column: span 3;
+  }
+
+  .planner-layout__board {
+    grid-column: span 6;
+  }
+}
+
+@media (min-width: 1280px) {
+  .exercise-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .page-shell {
+    width: min(100% - 1.25rem, 80rem);
+    padding-top: 6.5rem;
+    padding-bottom: 4rem;
+  }
+
+  .page-shell--planner,
+  .page-shell--session {
+    width: min(100% - 1.25rem, 100rem);
+    padding-top: 6.5rem;
+  }
+
+  .page-header {
+    margin-bottom: 2rem;
+  }
+
+  .page-header__title,
+  .session-header__title {
+    font-size: 2rem;
+  }
+
+  .page-header__lead {
+    font-size: 1rem;
+  }
+
+  .plan-board__header,
+  .planner-edit-copy,
+  .workout-slot {
+    flex-direction: column;
+  }
+
+  .plan-board__actions {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .plan-board__action {
+    flex: 1;
+  }
+
+  .workout-slot__order {
+    flex-direction: row;
+  }
+
+  .workout-slot__content {
+    width: 100%;
+  }
+
+  .workout-slot__edit-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .planner-management,
+  .planner-bulk-actions {
+    justify-content: stretch;
+  }
+
+  .planner-management form {
+    flex: 1;
+  }
+
+  .planner-management__button,
+  .planner-bulk-actions__save {
+    width: 100%;
+  }
+
+  .workout-slot__readonly {
+    grid-column: 1 / -1;
+  }
+
+  .site-nav {
+    height: 4.5rem;
+    padding-inline: 1rem;
+  }
+
+  .site-nav__brand {
+    font-size: 1.25rem;
+  }
+
+  .site-nav__links {
+    align-items: stretch;
+    max-height: calc(100vh - 6rem);
+    overflow-y: auto;
+  }
+
+  .surface-card--large,
+  .surface-card--medium {
+    padding: 1.5rem;
+  }
+
+  .dashboard-stat {
+    min-height: 13rem;
+  }
+
+  .dashboard-stat__value {
+    font-size: 3.25rem;
+  }
+
+  .dashboard-stat__title,
+  .dashboard-volume__title,
+  .dashboard-muscle-card__title {
+    font-size: 1.45rem;
+  }
+
+  .dashboard-detail-grid,
+  .history-stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-muscle-card__header,
+  .plan-board__header,
+  .workout-slot__header,
+  .dashboard-volume__row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .set-controls,
+  .muscle-focus__legend,
+  .session-tracking-fields,
+  .session-form__actions,
+  .sticky-action__fields,
+  .session-skip-actions,
+  .planner-add-form__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .workout-slot {
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1rem;
+  }
+
+  .workout-slot__stats {
+    gap: 0.5rem;
+  }
+
+  .stat-tile {
+    min-width: 4.5rem;
+  }
+
+  .workout-slot__order {
+    display: none;
+  }
+
+  .history-session-card__summary,
+  .history-exercise-group__header,
+  .planner-day__header,
+  .planner-plan-card__footer {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .history-session-card__metrics {
+    justify-content: flex-start;
+  }
+
+  .history-set-row {
+    grid-template-columns: 2rem minmax(0, 1fr);
+  }
+
+  .history-set-row span:nth-child(n + 3) {
+    grid-column: 2;
+  }
+
+  .admin-actions {
+    flex-wrap: wrap;
+  }
+
+  .admin-tabs {
+    flex-wrap: nowrap;
+    margin-inline: -0.25rem;
+    overflow-x: auto;
+    padding-bottom: 0.25rem;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .admin-tabs__link {
+    flex: 0 0 auto;
+  }
+
+  .admin-table {
+    min-width: 42rem;
+  }
+
+  .atlas-toolbar {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .filter-strip {
+    grid-template-columns: 2.5rem minmax(0, 1fr) 2.5rem;
+    gap: 0.5rem;
+  }
+
+  .filter-strip::before {
+    left: 3rem;
+  }
+
+  .filter-strip::after {
+    right: 3rem;
+  }
+
+  .filter-strip__button {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+
+  .workout-summary__stats,
+  .site-footer__links {
+    flex-wrap: wrap;
+  }
+
+  .session-plan__item {
+    grid-template-columns: 2rem minmax(0, 1fr);
+  }
+
+  .session-plan__status {
+    grid-column: 2;
+    justify-items: start;
+  }
+
+  .session-field--rpe {
+    max-width: none;
+  }
+
+  .session-confirm__panel {
+    grid-template-columns: 1fr;
+  }
+
+  .session-confirm__actions {
+    flex-direction: column-reverse;
+  }
+
+  .fab {
+    right: 1rem;
+  }
+}

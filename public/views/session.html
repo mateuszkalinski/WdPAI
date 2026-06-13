@@ -6,8 +6,9 @@
       return rtrim(rtrim($formatted, '0'), ',');
   };
 
-  $formatNumber = function ($value, int $decimals = 0): string {
-      return number_format((float) $value, $decimals, ',', ' ');
+  $formatRpe = function ($value): string {
+      $formatted = number_format((float) $value, 1, ',', ' ');
+      return rtrim(rtrim($formatted, '0'), ',');
   };
 
   $formatDateTime = function ($value): string {
@@ -25,14 +26,55 @@
   $exercises = $exercises ?? [];
   $sets = $sets ?? [];
   $activeSession = $activeSession ?? null;
-  $firstExercise = $exercises[0] ?? null;
+  $plannedWorkout = $plannedWorkout ?? null;
+  $plannedExercises = $plannedWorkout['exercises'] ?? [];
+  $plannedExerciseIds = array_map(fn($exercise) => (int) ($exercise['exercise_id'] ?? 0), $plannedExercises);
+  $extraExercises = array_values(array_filter(
+      $exercises,
+      fn($exercise) => !in_array((int) ($exercise['id'] ?? 0), $plannedExerciseIds, true)
+  ));
+  $nextPlannedExercise = null;
 
-  $setTypeLabels = [
-      'warmup' => 'Rozgrzewka',
-      'working' => 'Robocza',
-      'drop' => 'Drop set',
-      'failure' => 'Do upadku'
-  ];
+  foreach ($plannedExercises as $plannedExercise) {
+      $plannedProgress = (int) ($plannedExercise['completed_sets'] ?? 0) + (int) ($plannedExercise['skipped_sets'] ?? 0);
+
+      if ($plannedProgress < (int) ($plannedExercise['target_sets'] ?? 0)) {
+          $nextPlannedExercise = $plannedExercise;
+          break;
+      }
+  }
+
+  $firstExercise = $nextPlannedExercise ?? ($plannedExercises[0] ?? ($exercises[0] ?? null));
+  $firstExerciseId = (int) ($firstExercise['exercise_id'] ?? $firstExercise['id'] ?? 0);
+  $firstExerciseName = $firstExercise['exercise_name'] ?? $firstExercise['name'] ?? 'Wybierz cwiczenie';
+  $firstExerciseMuscle = $firstExercise['primary_muscle_group'] ?? 'Ogolne';
+  $firstExerciseEquipment = $firstExercise['equipment'] ?? 'Brak sprzetu';
+  $firstWeight = 40;
+  $firstReps = (int) ($firstExercise['target_reps_min'] ?? 10);
+  $firstRpe = '';
+
+  if (!empty($plannedExercises)) {
+      $planSelectExercises = array_map(function (array $exercise): array {
+          return [
+              'id' => (int) ($exercise['exercise_id'] ?? 0),
+               'name' => ((int) ($exercise['exercise_order'] ?? 0)).'. '.($exercise['exercise_name'] ?? 'Cwiczenie'),
+               'equipment' => $exercise['equipment'] ?? 'Brak sprzetu',
+               'primary_muscle_group' => $exercise['primary_muscle_group'] ?? 'Ogolne',
+               'last_weight_kg' => $exercise['last_weight_kg'] ?? null,
+               'last_reps' => $exercise['last_reps'] ?? null,
+               'last_rpe' => $exercise['last_rpe'] ?? null
+           ];
+       }, $plannedExercises);
+
+      $exercises = array_merge($planSelectExercises, $extraExercises);
+  }
+
+  if (is_array($firstExercise)) {
+      $firstExercise['name'] = $firstExerciseName;
+      $firstExercise['primary_muscle_group'] = $firstExerciseMuscle;
+      $firstExercise['equipment'] = $firstExerciseEquipment;
+  }
+
 ?>
 <!doctype html>
 <html lang="pl">
@@ -64,9 +106,14 @@
             <span class="material-symbols-outlined icon--filled session-timer__icon">timer</span>
             <span class="session-timer__value" data-session-timer>00:00:00</span>
           </div>
-          <button class="btn btn--primary" type="button" data-start-session <?= $activeSession ? 'hidden' : '' ?>>
-            <span class="material-symbols-outlined">play_arrow</span>
-            Rozpocznij
+          <button
+            class="btn <?= $activeSession ? 'btn--dark' : 'btn--primary' ?>"
+            type="button"
+            data-session-toggle
+            data-session-active="<?= $activeSession ? '1' : '0' ?>"
+          >
+            <span class="material-symbols-outlined" data-session-toggle-icon><?= $activeSession ? 'logout' : 'play_arrow' ?></span>
+            <span data-session-toggle-label><?= $activeSession ? 'Zakoncz trening' : 'Rozpocznij trening' ?></span>
           </button>
         </div>
       </header>
@@ -77,29 +124,32 @@
             <div class="session-card__accent"></div>
             <div class="session-card__header">
               <div>
-                <span class="section-eyebrow">Aktywne ćwiczenie</span>
+                <span class="section-eyebrow">Aktywne cwiczenie</span>
                 <h2 class="session-card__title" data-selected-exercise-name>
-                  <?= $h($firstExercise['name'] ?? 'Wybierz ćwiczenie') ?>
+                  <?= $h($firstExercise['name'] ?? 'Wybierz cwiczenie') ?>
                 </h2>
                 <p class="session-card__subtitle" data-selected-exercise-meta>
-                  <?= $h(trim(($firstExercise['primary_muscle_group'] ?? 'Brak partii').' · '.($firstExercise['equipment'] ?? 'Brak sprzętu'), ' ·')) ?>
+                  <?= $h(trim(($firstExercise['primary_muscle_group'] ?? 'Brak partii').' - '.($firstExercise['equipment'] ?? 'Brak sprzetu'), ' -')) ?>
                 </p>
               </div>
-              <a class="icon-button icon-button--ghost" href="/atlas" aria-label="Atlas ćwiczeń">
+              <a class="icon-button icon-button--ghost" href="/atlas" aria-label="Atlas cwiczen">
                 <span class="material-symbols-outlined">info</span>
               </a>
             </div>
 
             <form class="session-form" data-set-form>
               <label class="session-field session-field--full">
-                <span class="set-control__label">Ćwiczenie</span>
+                <span class="set-control__label">Cwiczenie</span>
                 <select class="session-select" name="exerciseId" data-exercise-select required>
                   <?php foreach ($exercises as $exercise): ?>
                     <option
                       value="<?= $h($exercise['id']) ?>"
                       data-name="<?= $h($exercise['name']) ?>"
-                      data-equipment="<?= $h($exercise['equipment'] ?? 'Brak sprzętu') ?>"
-                      data-muscle="<?= $h($exercise['primary_muscle_group'] ?? 'Ogólne') ?>"
+                      data-last-weight="<?= $h($exercise['last_weight_kg'] ?? '') ?>"
+                      data-last-reps="<?= $h($exercise['last_reps'] ?? '') ?>"
+                      data-last-rpe="<?= $h($exercise['last_rpe'] ?? '') ?>"
+                      data-equipment="<?= $h($exercise['equipment'] ?? 'Brak sprzetu') ?>"
+                      data-muscle="<?= $h($exercise['primary_muscle_group'] ?? 'Ogolne') ?>"
                     >
                       <?= $h($exercise['name']) ?>
                     </option>
@@ -109,76 +159,140 @@
 
               <div class="set-controls">
                 <div class="set-control">
-                  <label class="set-control__label" for="set-weight">Ciężar (kg)</label>
+                  <label class="set-control__label" for="set-weight">Ciezar (kg)</label>
                   <div class="stepper">
-                    <button class="stepper__button" type="button" data-step-target="set-weight" data-step="-2.5" aria-label="Zmniejsz ciężar">
+                    <button class="stepper__button" type="button" data-step-target="set-weight" data-step="-2.5" aria-label="Zmniejsz ciezar">
                       <span class="material-symbols-outlined">remove</span>
                     </button>
-                    <input class="stepper__field" id="set-weight" name="weightKg" type="number" min="0" step="0.5" value="40" required />
-                    <button class="stepper__button" type="button" data-step-target="set-weight" data-step="2.5" aria-label="Zwiększ ciężar">
+                    <input class="stepper__field" id="set-weight" name="weightKg" type="number" min="0" step="0.5" value="<?= $h($firstWeight) ?>" data-weight-input required />
+                    <button class="stepper__button" type="button" data-step-target="set-weight" data-step="2.5" aria-label="Zwieksz ciezar">
                       <span class="material-symbols-outlined">add</span>
                     </button>
                   </div>
                 </div>
 
                 <div class="set-control">
-                  <label class="set-control__label" for="set-reps">Powtórzenia</label>
+                  <label class="set-control__label" for="set-reps">Powtorzenia</label>
                   <div class="stepper">
-                    <button class="stepper__button" type="button" data-step-target="set-reps" data-step="-1" aria-label="Zmniejsz liczbę powtórzeń">
+                    <button class="stepper__button" type="button" data-step-target="set-reps" data-step="-1" aria-label="Zmniejsz liczbe powtorzen">
                       <span class="material-symbols-outlined">remove</span>
                     </button>
-                    <input class="stepper__field" id="set-reps" name="reps" type="number" min="1" step="1" value="10" required />
-                    <button class="stepper__button" type="button" data-step-target="set-reps" data-step="1" aria-label="Zwiększ liczbę powtórzeń">
+                    <input class="stepper__field" id="set-reps" name="reps" type="number" min="1" step="1" value="<?= $h($firstReps) ?>" required />
+                    <button class="stepper__button" type="button" data-step-target="set-reps" data-step="1" aria-label="Zwieksz liczbe powtorzen">
                       <span class="material-symbols-outlined">add</span>
                     </button>
                   </div>
                 </div>
 
-                <div class="set-control">
-                  <label class="set-control__label" for="set-rpe">RPE</label>
-                  <input class="session-number-field" id="set-rpe" name="rpe" type="number" min="0" max="10" step="0.5" value="8" />
-                </div>
-
-                <div class="set-control">
-                  <label class="set-control__label" for="set-type">Typ serii</label>
-                  <select class="session-select session-select--compact" id="set-type" name="setType">
-                    <?php foreach ($setTypeLabels as $value => $label): ?>
-                      <option value="<?= $h($value) ?>" <?= $value === 'working' ? 'selected' : '' ?>><?= $h($label) ?></option>
-                    <?php endforeach; ?>
-                  </select>
-                </div>
               </div>
 
-              <label class="session-field session-field--full">
-                <span class="set-control__label">Notatka do serii</span>
-                <textarea class="session-textarea" name="note" rows="3" placeholder="Opcjonalnie: technika, zapas, ból, tempo..."></textarea>
-              </label>
+              <div class="session-weight-hint" data-weight-hint hidden>
+                <span class="material-symbols-outlined">history</span>
+                <span data-weight-hint-text></span>
+              </div>
+
+              <div class="session-tracking-fields">
+                <label class="session-field session-field--rpe">
+                  <span class="set-control__label">RPE (dla danej serii)</span>
+                  <input class="session-finish-field__input" id="set-rpe" name="rpe" type="number" min="0" max="10" step="0.5" placeholder="np. 8" />
+                </label>
+                <label class="session-field session-field--full">
+                  <span class="set-control__label">Notatka do treningu</span>
+                  <textarea class="session-finish-field__input session-finish-field__textarea" data-session-notes rows="3" placeholder="Opcjonalnie: technika, zapas, bol, tempo..."></textarea>
+                </label>
+              </div>
 
               <p class="session-message" data-session-message role="status"></p>
 
-              <button class="btn btn--success btn--full session-card__submit" type="submit" <?= empty($exercises) ? 'disabled' : '' ?>>
-                <span class="material-symbols-outlined icon--filled">check_circle</span>
-                Zapisz serię
-              </button>
+              <div class="session-form__actions">
+                <button class="btn btn--success session-card__submit" type="submit" <?= empty($exercises) ? 'disabled' : '' ?>>
+                  <span class="material-symbols-outlined icon--filled">check_circle</span>
+                  Zapisz serie
+                </button>
+
+                <div class="session-skip-actions" <?= empty($plannedExercises) ? 'hidden' : '' ?>>
+                  <button class="btn btn--ghost session-skip-actions__button" type="button" data-next-exercise>
+                    <span class="material-symbols-outlined" data-next-exercise-icon>skip_next</span>
+                    <span data-next-exercise-label>Nastepne cwiczenie</span>
+                  </button>
+                </div>
+              </div>
             </form>
           </section>
 
-          <div class="rest-timer" data-rest-panel hidden>
-            <div class="rest-timer__content">
-              <div class="rest-timer__spinner"></div>
-              <div>
-                <p class="rest-timer__label">Seria zapisana</p>
-                <p class="rest-timer__time">Odpocznij chwilę <span class="rest-timer__total">i leć dalej</span></p>
-              </div>
-            </div>
-            <button class="rest-timer__skip" type="button" data-rest-hide>Pomiń</button>
-          </div>
         </div>
 
         <aside class="session-layout__aside">
+          <section class="surface-card surface-card--large session-plan" data-session-plan>
+            <div class="panel-header">
+              <div>
+                <span class="section-eyebrow">Aktywny plan</span>
+                <h2 class="set-history__heading">
+                  <?= $plannedWorkout ? $h($plannedWorkout['day_name'] ?? $plannedWorkout['plan_name'] ?? 'Plan treningowy') : 'Brak aktywnego planu' ?>
+                </h2>
+              </div>
+              <?php if ($plannedWorkout && !empty($plannedWorkout['plan_name'])): ?>
+                <span class="badge badge--neutral"><?= $h($plannedWorkout['plan_name']) ?></span>
+              <?php endif; ?>
+            </div>
+
+            <?php if (empty($plannedExercises)): ?>
+              <div class="set-history__empty">
+                <span class="material-symbols-outlined">event_note</span>
+                <p>Wybierz aktywny plan w planerze, zeby sesja prowadzila po cwiczeniach.</p>
+              </div>
+            <?php else: ?>
+              <div class="session-plan__list">
+                <?php foreach ($plannedExercises as $exercise): ?>
+                  <?php
+                    $exerciseId = (int) ($exercise['exercise_id'] ?? 0);
+                    $completedSets = (int) ($exercise['completed_sets'] ?? 0);
+                    $skippedSets = (int) ($exercise['skipped_sets'] ?? 0);
+                    $targetSets = (int) ($exercise['target_sets'] ?? 0);
+                    $progressSets = $completedSets;
+                    $isDone = $targetSets > 0 && ($completedSets + $skippedSets) >= $targetSets;
+                    $isCurrent = !$isDone
+                        && $nextPlannedExercise
+                        && (int) ($nextPlannedExercise['plan_exercise_id'] ?? 0) === (int) ($exercise['plan_exercise_id'] ?? 0);
+                  ?>
+                  <button
+                    class="session-plan__item <?= $isDone ? 'session-plan__item--done' : '' ?> <?= $skippedSets > 0 ? 'session-plan__item--skipped' : '' ?> <?= $isCurrent ? 'session-plan__item--current' : '' ?>"
+                    type="button"
+                    data-plan-item
+                    data-exercise-id="<?= $h($exerciseId) ?>"
+                    data-plan-exercise-id="<?= $h($exercise['plan_exercise_id'] ?? '') ?>"
+                    data-target-sets="<?= $targetSets ?>"
+                    data-completed-sets="<?= $completedSets ?>"
+                    data-skipped-sets="<?= $skippedSets ?>"
+                    data-target-reps-min="<?= $h($exercise['target_reps_min'] ?? '') ?>"
+                    data-target-reps-max="<?= $h($exercise['target_reps_max'] ?? '') ?>"
+                    data-last-weight="<?= $h($exercise['last_weight_kg'] ?? '') ?>"
+                    data-last-reps="<?= $h($exercise['last_reps'] ?? '') ?>"
+                    data-last-rpe="<?= $h($exercise['last_rpe'] ?? '') ?>"
+                    data-select-exercise="<?= $h($exerciseId) ?>"
+                  >
+                    <span class="session-plan__order"><?= (int) ($exercise['exercise_order'] ?? 0) ?></span>
+                    <span class="session-plan__body">
+                      <span class="session-plan__name"><?= $h($exercise['exercise_name']) ?></span>
+                      <span class="session-plan__meta">
+                        <?= $h($exercise['target_reps_min'] ?? '-') ?>-<?= $h($exercise['target_reps_max'] ?? '-') ?> powt.
+                      </span>
+                    </span>
+                    <span class="session-plan__status">
+                      <span class="session-plan__progress" data-plan-progress><?= $progressSets ?>/<?= $targetSets ?></span>
+                      <span class="session-plan__skip-note" data-plan-skip-note <?= $skippedSets > 0 ? '' : 'hidden' ?>>
+                        <?= $skippedSets ?> pom.
+                      </span>
+                    </span>
+                  </button>
+                <?php endforeach; ?>
+              </div>
+            <?php endif; ?>
+          </section>
+
           <section class="surface-card surface-card--large set-history">
             <div class="panel-header">
-              <h2 class="set-history__heading">Ukończone serie</h2>
+              <h2 class="set-history__heading">Ukonczone serie</h2>
               <span class="badge badge--primary" data-set-count><?= count($sets) ?></span>
             </div>
 
@@ -190,59 +304,55 @@
                       <span class="material-symbols-outlined icon--filled set-history__status-icon">done</span>
                     </div>
                     <div>
-                      <span class="set-history__name"><?= $h($set['exercise_name']) ?> · seria <?= (int) $set['set_order'] ?></span>
-                      <span class="set-history__meta"><?= $h($formatWeight($set['weight_kg'])) ?> kg × <?= (int) $set['reps'] ?></span>
+                      <span class="set-history__name"><?= $h($set['exercise_name']) ?> - seria <?= (int) $set['set_order'] ?></span>
+                      <span class="set-history__meta"><?= $h($formatWeight($set['weight_kg'])) ?> kg - <?= (int) $set['reps'] ?></span>
                     </div>
                   </div>
-                  <span class="set-history__rpe">RPE <?= ($set['rpe'] ?? null) !== null ? $h($formatNumber($set['rpe'], 1)) : 'brak' ?></span>
+                  <?php if (($set['rpe'] ?? null) !== null): ?>
+                    <span class="set-history__rpe">RPE <?= $h($formatRpe($set['rpe'])) ?></span>
+                  <?php endif; ?>
                 </div>
               <?php endforeach; ?>
 
               <div class="set-history__empty" data-empty-sets <?= empty($sets) ? '' : 'hidden' ?>>
                 <span class="material-symbols-outlined">add_task</span>
-                <p>Pierwsza zapisana seria pojawi się tutaj.</p>
+                <p>Pierwsza zapisana seria pojawi sie tutaj.</p>
               </div>
             </div>
           </section>
 
           <section class="next-exercise">
             <div class="next-exercise__icon">
-              <span class="material-symbols-outlined">database</span>
+              <span class="material-symbols-outlined">trending_flat</span>
             </div>
             <div class="next-exercise__body">
-              <p class="next-exercise__label">Źródło danych</p>
-              <p class="next-exercise__title">Serie zapisują się do PostgreSQL</p>
+              <p class="next-exercise__label">Nastepny krok</p>
+              <p class="next-exercise__title">Zapisz serie albo zakoncz trening</p>
             </div>
-            <span class="material-symbols-outlined next-exercise__arrow">sync</span>
+            <span class="material-symbols-outlined next-exercise__arrow">fitness_center</span>
           </section>
         </aside>
       </div>
 
-      <section class="sticky-action sticky-action--session">
-        <div class="sticky-action__fields">
-          <label class="session-finish-field">
-            <span>RPE sesji</span>
-            <input class="session-finish-field__input" type="number" min="0" max="10" step="0.5" data-session-rpe />
-          </label>
-          <label class="session-finish-field session-finish-field--wide">
-            <span>Notatka do treningu</span>
-            <input class="session-finish-field__input" type="text" data-session-notes placeholder="Opcjonalnie" />
-          </label>
+      <div class="session-confirm" data-finish-confirm-modal hidden role="dialog" aria-modal="true" aria-labelledby="finish-confirm-title">
+        <div class="session-confirm__panel">
+          <div class="session-confirm__icon">
+            <span class="material-symbols-outlined">logout</span>
+          </div>
+          <div class="session-confirm__body">
+            <h2 id="finish-confirm-title">Zakonczyc trening?</h2>
+            <p>Po zakonczeniu sesja trafi do historii razem z zapisanymi seriami i notatka treningowa.</p>
+          </div>
+          <div class="session-confirm__actions">
+            <button class="btn btn--ghost" type="button" data-finish-confirm-cancel>Anuluj</button>
+            <button class="btn btn--dark" type="button" data-finish-confirm-accept>
+              <span class="material-symbols-outlined">check</span>
+              Zakoncz trening
+            </button>
+          </div>
         </div>
-        <button class="btn btn--dark btn--full sticky-action__button" type="button" data-finish-session <?= $activeSession ? '' : 'disabled' ?>>
-          <span class="material-symbols-outlined">logout</span>
-          Zakończ trening
-        </button>
-      </section>
+      </div>
     </main>
 
-    <footer class="site-footer site-footer--inline">
-      <div class="site-footer__meta">© 2026 Hipertrof.io. All rights reserved.</div>
-      <div class="site-footer__links">
-        <a class="site-footer__link" href="/dashboard">Dashboard</a>
-        <a class="site-footer__link" href="/history">Historia</a>
-        <a class="site-footer__link" href="/atlas">Atlas</a>
-      </div>
-    </footer>
   </body>
 </html>

@@ -1,84 +1,147 @@
 <?php
 
 require_once 'AppController.php';
-require_once __DIR__.'/../repositories/DashboardRepository.php';
-require_once __DIR__.'/../repositories/ExerciseRepository.php';
-require_once __DIR__.'/../repositories/HistoryRepository.php';
-require_once __DIR__.'/../repositories/WorkoutRepository.php';
+require_once __DIR__.'/../services/DashboardService.php';
+require_once __DIR__.'/../services/PlannerService.php';
+require_once __DIR__.'/../services/ExerciseService.php';
+require_once __DIR__.'/../services/WorkoutService.php';
+require_once __DIR__.'/../services/HistoryService.php';
 
 class DashboardController extends AppController
 {
+    private ?DashboardService $dashboardService = null;
+    private ?PlannerService $plannerService = null;
+    private ?ExerciseService $exerciseService = null;
+    private ?WorkoutService $workoutService = null;
+    private ?HistoryService $historyService = null;
+
     public function index(): void
     {
         $this->requireLogin();
-
-        $userId = (int) $_SESSION['user_id'];
-        $dashboardRepository = new DashboardRepository();
-
-        $this->render("dashboard", [
-            "title" => "Dashboard",
-            "summary" => $dashboardRepository->getTrainingSummary($userId),
-            "weeklyMuscles" => $dashboardRepository->getWeeklyMuscleSummary($userId),
-            "lastSession" => $dashboardRepository->getLastSession($userId),
-            "recentSessions" => $dashboardRepository->getRecentSessions($userId),
-            "badges" => $dashboardRepository->getBadges($userId),
-            "activePlan" => $dashboardRepository->getActivePlan($userId),
-            "activeTab" => "dashboard"
-        ]);
+        $this->render('dashboard', $this->dashboardService()->dashboardData((int) $_SESSION['user_id']));
     }
 
     public function planer(): void
     {
         $this->requireLogin();
-        $this->render("planer", ["activeTab" => "planer"]);
+
+        $plannerMessage = $_SESSION['planner_message'] ?? null;
+        unset($_SESSION['planner_message']);
+
+        $this->render('planer', $this->plannerService()->plannerData((int) $_SESSION['user_id'], $plannerMessage));
+    }
+
+    public function activatePlan(): void
+    {
+        $this->requirePlannerPost();
+        $_SESSION['planner_message'] = $this->plannerService()->activatePlan((int) $_SESSION['user_id'], $_POST['plan_id'] ?? null);
+        $this->redirect('/planer');
+    }
+
+    public function createPlan(): void
+    {
+        $this->requirePlannerPost();
+        $_SESSION['planner_message'] = $this->plannerService()->createEmptyPlan((int) $_SESSION['user_id'], $_POST);
+        $this->redirect('/planer');
+    }
+
+    public function editActivePlan(): void
+    {
+        $this->requirePlannerPost();
+        $_SESSION['planner_message'] = $this->plannerService()->makeActivePlanEditable((int) $_SESSION['user_id']);
+        $this->redirect('/planer?edit=1');
+    }
+
+    public function addPlanExercise(): void
+    {
+        $this->requirePlannerPost();
+        $_SESSION['planner_message'] = $this->plannerService()->addExerciseToActivePlan((int) $_SESSION['user_id'], $_POST);
+        $this->redirect('/planer');
+    }
+
+    public function updatePlanExercise(): void
+    {
+        $this->requirePlannerPost();
+        $_SESSION['planner_message'] = $this->plannerService()->updatePlanExercise((int) $_SESSION['user_id'], $_POST);
+        $this->redirect('/planer');
+    }
+
+    public function movePlanExercise(): void
+    {
+        $this->requirePlannerPost();
+        $_SESSION['planner_message'] = $this->plannerService()->movePlanExercise((int) $_SESSION['user_id'], $_POST);
+        $this->redirect('/planer');
+    }
+
+    public function deletePlanExercise(): void
+    {
+        $this->requirePlannerPost();
+        $_SESSION['planner_message'] = $this->plannerService()->deletePlanExercise((int) $_SESSION['user_id'], $_POST['plan_exercise_id'] ?? null);
+        $this->redirect('/planer');
+    }
+
+    public function deletePlan(): void
+    {
+        $this->requirePlannerPost();
+        $_SESSION['planner_message'] = $this->plannerService()->deletePlan((int) $_SESSION['user_id'], $_POST['plan_id'] ?? null);
+        $this->redirect('/planer');
     }
 
     public function session(): void
     {
         $this->requireLogin();
 
-        $userId = (int) $_SESSION['user_id'];
-        $exerciseRepository = new ExerciseRepository();
-        $workoutRepository = new WorkoutRepository();
-        $activeSession = $workoutRepository->getActiveSession($userId);
-
-        $this->render("session", [
-            "title" => "Sesja treningowa",
-            "activeTab" => "session",
-            "exercises" => $exerciseRepository->getActiveExercises(),
-            "activeSession" => $activeSession,
-            "sets" => $activeSession ? $workoutRepository->getSetsForSession($userId, (int) $activeSession['id']) : []
-        ]);
+        $this->render(
+            'session',
+            $this->workoutService()->sessionData((int) $_SESSION['user_id'], $this->exerciseService()->activeExercises())
+        );
     }
 
     public function atlas(): void
     {
         $this->requireLogin();
-
-        $exerciseRepository = new ExerciseRepository();
-
-        $this->render("atlas", [
-            "activeTab" => "atlas",
-            "exercises" => $exerciseRepository->getActiveExercises(),
-            "muscleGroups" => $exerciseRepository->getMuscleGroups()
-        ]);
+        $this->render('atlas', $this->exerciseService()->atlasData());
     }
 
     public function history(): void
     {
         $this->requireLogin();
+        $this->render('history', $this->historyService()->historyData((int) $_SESSION['user_id']));
+    }
 
-        $userId = (int) $_SESSION['user_id'];
-        $historyRepository = new HistoryRepository();
-        $sessions = $historyRepository->getSessions($userId);
+    private function requirePlannerPost(): void
+    {
+        $this->requireLogin();
 
-        $this->render("history", [
-            "title" => "Historia",
-            "activeTab" => "history",
-            "summary" => $historyRepository->getHistorySummary($userId),
-            "sessions" => $sessions,
-            "setsBySession" => $historyRepository->getSetsForSessions($userId, array_column($sessions, 'id')),
-            "records" => $historyRepository->getExerciseRecords($userId)
-        ]);
+        if (!$this->isPost()) {
+            $this->redirect('/planer');
+        }
+
+        $this->requireCsrf();
+    }
+
+    private function dashboardService(): DashboardService
+    {
+        return $this->dashboardService ??= new DashboardService();
+    }
+
+    private function plannerService(): PlannerService
+    {
+        return $this->plannerService ??= new PlannerService();
+    }
+
+    private function exerciseService(): ExerciseService
+    {
+        return $this->exerciseService ??= new ExerciseService();
+    }
+
+    private function workoutService(): WorkoutService
+    {
+        return $this->workoutService ??= new WorkoutService();
+    }
+
+    private function historyService(): HistoryService
+    {
+        return $this->historyService ??= new HistoryService();
     }
 }

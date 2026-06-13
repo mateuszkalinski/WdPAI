@@ -1,69 +1,35 @@
 <?php
 
 require_once 'AppController.php';
-require_once __DIR__.'/../repositories/ExerciseRepository.php';
-require_once __DIR__.'/../repositories/WorkoutRepository.php';
+require_once __DIR__.'/../services/ExerciseService.php';
+require_once __DIR__.'/../services/WorkoutService.php';
 
 class ApiController extends AppController
 {
-    private ExerciseRepository $exerciseRepository;
-    private WorkoutRepository $workoutRepository;
-
-    public function __construct()
-    {
-        $this->exerciseRepository = new ExerciseRepository();
-        $this->workoutRepository = new WorkoutRepository();
-    }
+    private ?ExerciseService $exerciseService = null;
+    private ?WorkoutService $workoutService = null;
 
     public function searchExercises(): void
     {
-        if (!$this->isLogged()) {
-            $this->jsonResponse(['error' => 'Unauthorized'], 401);
-            return;
-        }
-
-        if (!$this->isPost()) {
-            $this->jsonResponse(['error' => 'Method not allowed'], 405);
-            return;
-        }
-
-        $payload = $this->readJsonPayload();
+        $payload = $this->requireJsonPost();
         if ($payload === null) {
             return;
         }
 
-        $search = trim((string) ($payload['search'] ?? ''));
-        $muscleGroupId = $this->nullableInt($payload['muscleGroupId'] ?? null);
-
         $this->jsonResponse([
-            'exercises' => $this->exerciseRepository->searchExercises($search, $muscleGroupId)
+            'exercises' => $this->exerciseService()->search($payload)
         ]);
     }
 
     public function startWorkoutSession(): void
     {
-        if (!$this->isLogged()) {
-            $this->jsonResponse(['error' => 'Unauthorized'], 401);
-            return;
-        }
-
-        if (!$this->isPost()) {
-            $this->jsonResponse(['error' => 'Method not allowed'], 405);
-            return;
-        }
-
-        $payload = $this->readJsonPayload();
+        $payload = $this->requireJsonPost();
         if ($payload === null) {
             return;
         }
 
         try {
-            $session = $this->workoutRepository->startSession((int) $_SESSION['user_id']);
-
-            $this->jsonResponse([
-                'session' => $session,
-                'sets' => $this->workoutRepository->getSetsForSession((int) $_SESSION['user_id'], (int) $session['id'])
-            ], 201);
+            $this->jsonResponse($this->workoutService()->startSession((int) $_SESSION['user_id']), 201);
         } catch (Throwable) {
             $this->jsonResponse(['error' => 'Nie udalo sie rozpoczac sesji'], 500);
         }
@@ -71,56 +37,13 @@ class ApiController extends AppController
 
     public function addWorkoutSet(): void
     {
-        if (!$this->isLogged()) {
-            $this->jsonResponse(['error' => 'Unauthorized'], 401);
-            return;
-        }
-
-        if (!$this->isPost()) {
-            $this->jsonResponse(['error' => 'Method not allowed'], 405);
-            return;
-        }
-
-        $payload = $this->readJsonPayload();
+        $payload = $this->requireJsonPost();
         if ($payload === null) {
             return;
         }
 
-        $exerciseId = $this->positiveInt($payload['exerciseId'] ?? null);
-        $weightKg = $this->nonNegativeFloat($payload['weightKg'] ?? null);
-        $reps = $this->positiveInt($payload['reps'] ?? null);
-        $rpe = $this->nullableFloat($payload['rpe'] ?? null);
-        $setType = (string) ($payload['setType'] ?? 'working');
-        $note = trim((string) ($payload['note'] ?? ''));
-        $note = $note === '' ? null : substr($note, 0, 500);
-
-        if ($exerciseId === null || $weightKg === null || $reps === null) {
-            $this->jsonResponse(['error' => 'Podaj cwiczenie, ciezar i liczbe powtorzen'], 400);
-            return;
-        }
-
-        if ($rpe !== null && ($rpe < 0 || $rpe > 10)) {
-            $this->jsonResponse(['error' => 'RPE musi byc w zakresie 0-10'], 400);
-            return;
-        }
-
-        if (!in_array($setType, ['warmup', 'working', 'drop', 'failure'], true)) {
-            $this->jsonResponse(['error' => 'Nieprawidlowy typ serii'], 400);
-            return;
-        }
-
         try {
-            $result = $this->workoutRepository->addSet(
-                (int) $_SESSION['user_id'],
-                $exerciseId,
-                $weightKg,
-                $reps,
-                $rpe,
-                $setType,
-                $note
-            );
-
-            $this->jsonResponse($result, 201);
+            $this->jsonResponse($this->workoutService()->addSet((int) $_SESSION['user_id'], $payload), 201);
         } catch (InvalidArgumentException $exception) {
             $this->jsonResponse(['error' => $exception->getMessage()], 400);
         } catch (Throwable) {
@@ -128,34 +51,31 @@ class ApiController extends AppController
         }
     }
 
-    public function finishWorkoutSession(): void
+    public function skipWorkoutPlanItem(): void
     {
-        if (!$this->isLogged()) {
-            $this->jsonResponse(['error' => 'Unauthorized'], 401);
-            return;
-        }
-
-        if (!$this->isPost()) {
-            $this->jsonResponse(['error' => 'Method not allowed'], 405);
-            return;
-        }
-
-        $payload = $this->readJsonPayload();
+        $payload = $this->requireJsonPost();
         if ($payload === null) {
             return;
         }
 
-        $sessionRpe = $this->nullableFloat($payload['sessionRpe'] ?? null);
-        $notes = trim((string) ($payload['notes'] ?? ''));
-        $notes = $notes === '' ? null : substr($notes, 0, 1000);
+        try {
+            $this->jsonResponse($this->workoutService()->skipPlanItem((int) $_SESSION['user_id'], $payload));
+        } catch (InvalidArgumentException $exception) {
+            $this->jsonResponse(['error' => $exception->getMessage()], 400);
+        } catch (Throwable) {
+            $this->jsonResponse(['error' => 'Nie udalo sie pominac elementu planu'], 500);
+        }
+    }
 
-        if ($sessionRpe !== null && ($sessionRpe < 0 || $sessionRpe > 10)) {
-            $this->jsonResponse(['error' => 'RPE sesji musi byc w zakresie 0-10'], 400);
+    public function finishWorkoutSession(): void
+    {
+        $payload = $this->requireJsonPost();
+        if ($payload === null) {
             return;
         }
 
         try {
-            $result = $this->workoutRepository->finishActiveSession((int) $_SESSION['user_id'], $sessionRpe, $notes);
+            $result = $this->workoutService()->finishActiveSession((int) $_SESSION['user_id'], $payload);
 
             if ($result === null) {
                 $this->jsonResponse(['error' => 'Brak aktywnej sesji do zakonczenia'], 400);
@@ -163,14 +83,36 @@ class ApiController extends AppController
             }
 
             $this->jsonResponse($result);
+        } catch (InvalidArgumentException $exception) {
+            $this->jsonResponse(['error' => $exception->getMessage()], 400);
         } catch (Throwable) {
             $this->jsonResponse(['error' => 'Nie udalo sie zakonczyc sesji'], 500);
         }
     }
 
+    private function requireJsonPost(): ?array
+    {
+        if (!$this->isLogged()) {
+            $this->jsonResponse(['error' => 'Unauthorized'], 401);
+            return null;
+        }
+
+        if (!$this->isPost()) {
+            $this->jsonResponse(['error' => 'Method not allowed'], 405);
+            return null;
+        }
+
+        if (!$this->isValidCsrfToken($_SERVER['HTTP_X_CSRF_TOKEN'] ?? null)) {
+            $this->jsonResponse(['error' => 'Nieprawidlowy token bezpieczenstwa'], 400);
+            return null;
+        }
+
+        return $this->readJsonPayload();
+    }
+
     private function readJsonPayload(): ?array
     {
-        $contentType = $_SERVER["CONTENT_TYPE"] ?? '';
+        $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
 
         if (stripos($contentType, 'application/json') === false) {
             $this->jsonResponse(['error' => 'Expected application/json'], 400);
@@ -194,34 +136,13 @@ class ApiController extends AppController
         echo json_encode($payload, JSON_UNESCAPED_UNICODE);
     }
 
-    private function nullableInt($value): ?int
+    private function exerciseService(): ExerciseService
     {
-        if ($value === null || $value === '') {
-            return null;
-        }
-
-        $intValue = filter_var($value, FILTER_VALIDATE_INT);
-        return $intValue === false ? null : (int) $intValue;
+        return $this->exerciseService ??= new ExerciseService();
     }
 
-    private function positiveInt($value): ?int
+    private function workoutService(): WorkoutService
     {
-        $intValue = $this->nullableInt($value);
-        return $intValue !== null && $intValue > 0 ? $intValue : null;
-    }
-
-    private function nullableFloat($value): ?float
-    {
-        if ($value === null || $value === '') {
-            return null;
-        }
-
-        return is_numeric($value) ? (float) $value : null;
-    }
-
-    private function nonNegativeFloat($value): ?float
-    {
-        $floatValue = $this->nullableFloat($value);
-        return $floatValue !== null && $floatValue >= 0 ? $floatValue : null;
+        return $this->workoutService ??= new WorkoutService();
     }
 }

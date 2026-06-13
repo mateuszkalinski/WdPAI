@@ -1,235 +1,398 @@
+<?php
+  $h = fn($value) => htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
+
+  $formatReps = function ($min, $max): string {
+      if ($min === null && $max === null) {
+          return 'dowolnie';
+      }
+
+      if ((string) $min === (string) $max || $max === null) {
+          return (string) $min;
+      }
+
+      return $min.'-'.$max;
+  };
+
+  $isTruthy = fn($value) => $value === true || $value === 1 || $value === '1' || $value === 't' || $value === 'true';
+
+  $goalLabels = [
+      'strength' => 'siła',
+      'hypertrophy' => 'hipertrofia',
+      'endurance' => 'wytrzymałość',
+      'general' => 'ogólny'
+  ];
+  $levelLabels = [
+      'beginner' => 'początkujący',
+      'intermediate' => 'średni',
+      'advanced' => 'zaawansowany'
+  ];
+
+  $activePlan = $activePlan ?? null;
+  $availablePlans = $availablePlans ?? [];
+  $planDays = $planDays ?? [];
+  $planExercises = $planExercises ?? [];
+  $muscleVolume = $muscleVolume ?? [];
+  $exercises = $exercises ?? [];
+  $canEditActivePlan = $activePlan
+      && (int) ($activePlan['owner_user_id'] ?? 0) === (int) ($_SESSION['user_id'] ?? 0)
+      && !$isTruthy($activePlan['is_template'] ?? false);
+  $isEditingActivePlan = $canEditActivePlan && ($_GET['edit'] ?? '') === '1';
+  $totalSets = array_sum(array_map(fn($row) => (int) ($row['sets_count'] ?? 0), $muscleVolume));
+  $maxSets = max(1, ...array_map(fn($row) => (int) ($row['sets_count'] ?? 0), $muscleVolume ?: [['sets_count' => 1]]));
+?>
 <!doctype html>
-<html lang="en">
+<html lang="pl">
   <head>
     <?php include __DIR__ . '/partials/head.html'; ?>
-    <title>DASHBOARD</title>
+    <title><?= $h($title ?? 'Planer') ?> | Hipertrof.io</title>
   </head>
   <body class="app-body">
     <?php include __DIR__ . '/partials/nav.html'; ?>
 
-<!-- Main Content Canvas -->
-<main class="page-shell page-shell--planner">
-<div class="planner-layout">
-<!-- Left Column: Searchable List -->
-<section class="planner-layout__library">
-<div class="surface-card surface-card--medium planner-library__search-card">
-<h2 class="section-eyebrow">Atlas Ćwiczeń</h2>
-<div class="search-box search-box--compact">
-<span class="material-symbols-outlined search-box__icon" data-icon="search">search</span>
-<input class="search-box__input" placeholder="Szukaj ćwiczenia..." type="text"/>
-</div>
-</div>
-<div class="exercise-list">
-<!-- Exercise Items -->
-<div class="exercise-list__item">
-<div class="exercise-list__icon">
-<span class="material-symbols-outlined exercise-list__icon-symbol" data-icon="fitness_center">fitness_center</span>
-</div>
-<div class="exercise-list__content">
-<p class="exercise-list__title">Wyciskanie Hantli</p>
-<span class="exercise-list__muscle">Klatka Piersiowa</span>
-</div>
-<span class="material-symbols-outlined exercise-list__drag" data-icon="drag_indicator">drag_indicator</span>
-</div>
-<div class="exercise-list__item exercise-list__item--featured">
-<div class="exercise-list__icon">
-<span class="material-symbols-outlined exercise-list__icon-symbol exercise-list__icon-symbol--secondary" data-icon="pulley">trolley_cable_car</span>
-</div>
-<div class="exercise-list__content">
-<p class="exercise-list__title">Podciąganie Nachwytem</p>
-<span class="exercise-list__muscle">Plecy</span>
-</div>
-<span class="material-symbols-outlined exercise-list__drag" data-icon="drag_indicator">drag_indicator</span>
-</div>
-<div class="exercise-list__item">
-<div class="exercise-list__icon">
-<span class="material-symbols-outlined exercise-list__icon-symbol" data-icon="exercise">exercise</span>
-</div>
-<div class="exercise-list__content">
-<p class="exercise-list__title">Wyciskanie Żołnierskie</p>
-<span class="exercise-list__muscle">Barki</span>
-</div>
-<span class="material-symbols-outlined exercise-list__drag" data-icon="drag_indicator">drag_indicator</span>
-</div>
-<div class="exercise-list__item">
-<div class="exercise-list__icon">
-<span class="material-symbols-outlined exercise-list__icon-symbol" data-icon="settings_accessibility">settings_accessibility</span>
-</div>
-<div class="exercise-list__content">
-<p class="exercise-list__title">Rozpiętki na Bramie</p>
-<span class="exercise-list__muscle">Klatka Piersiowa</span>
-</div>
-<span class="material-symbols-outlined exercise-list__drag" data-icon="drag_indicator">drag_indicator</span>
-</div>
-<div class="exercise-list__item">
-<div class="exercise-list__icon">
-<span class="material-symbols-outlined exercise-list__icon-symbol" data-icon="bolt">bolt</span>
-</div>
-<div class="exercise-list__content">
-<p class="exercise-list__title">Wznosy Bokiem</p>
-<span class="exercise-list__muscle">Barki</span>
-</div>
-<span class="material-symbols-outlined exercise-list__drag" data-icon="drag_indicator">drag_indicator</span>
-</div>
-</div>
-</section>
-<!-- Center Column: Drag-and-Drop Area -->
-<section class="planner-layout__board">
-<div class="surface-card surface-card--board plan-board">
-<div class="plan-board__header">
-<div>
-<h1 class="plan-board__title">Trening Poniedziałkowy</h1>
-<p class="plan-board__subtitle">Push / Upper Body Focus</p>
-</div>
-<div class="plan-board__actions">
-<button class="icon-button icon-button--soft icon-button--primary material-symbols-outlined" type="button" data-icon="save" aria-label="Zapisz">save</button>
-<button class="icon-button icon-button--primary material-symbols-outlined" type="button" data-icon="play_arrow" aria-label="Start">play_arrow</button>
-</div>
-</div>
-<!-- Slot Layout -->
-<div class="workout-slots">
-<!-- Filled Slot -->
-<div class="workout-slot">
-<div class="workout-slot__order">
-<button class="material-symbols-outlined workout-slot__order-button" type="button" data-icon="keyboard_arrow_up">keyboard_arrow_up</button>
-<span class="workout-slot__number">1</span>
-<button class="material-symbols-outlined workout-slot__order-button" type="button" data-icon="keyboard_arrow_down">keyboard_arrow_down</button>
-</div>
-<div class="workout-slot__content">
-<div class="workout-slot__header">
-<h3 class="workout-slot__title">Wyciskanie Sztangi Skos Dodatni</h3>
-<span class="badge badge--primary">Main Lift</span>
-</div>
-<div class="workout-slot__stats">
-<div class="stat-tile">
-<span class="stat-tile__label">Sets</span>
-<span class="stat-tile__value">3</span>
-</div>
-<div class="stat-tile">
-<span class="stat-tile__label">Reps</span>
-<span class="stat-tile__value">8-10</span>
-</div>
-<div class="stat-tile">
-<span class="stat-tile__label">RPE</span>
-<span class="stat-tile__value">8.5</span>
-</div>
-</div>
-</div>
-<button class="material-symbols-outlined workout-slot__delete" type="button" data-icon="delete" aria-label="Usuń">delete</button>
-</div>
-<!-- Empty Drop Target -->
-<div class="drop-zone">
-<span class="material-symbols-outlined drop-zone__icon" data-icon="add_circle">add_circle</span>
-<p class="drop-zone__text">Przeciągnij ćwiczenie tutaj</p>
-</div>
-<!-- Filled Slot -->
-<div class="workout-slot">
-<div class="workout-slot__order">
-<button class="material-symbols-outlined workout-slot__order-button" type="button" data-icon="keyboard_arrow_up">keyboard_arrow_up</button>
-<span class="workout-slot__number">2</span>
-<button class="material-symbols-outlined workout-slot__order-button" type="button" data-icon="keyboard_arrow_down">keyboard_arrow_down</button>
-</div>
-<div class="workout-slot__content">
-<div class="workout-slot__header">
-<h3 class="workout-slot__title">Podciąganie Sztangi w Opadzie</h3>
-<span class="badge badge--neutral">Hypertrophy</span>
-</div>
-<div class="workout-slot__stats">
-<div class="stat-tile">
-<span class="stat-tile__label">Sets</span>
-<span class="stat-tile__value">4</span>
-</div>
-<div class="stat-tile">
-<span class="stat-tile__label">Reps</span>
-<span class="stat-tile__value">12</span>
-</div>
-</div>
-</div>
-<button class="material-symbols-outlined workout-slot__delete" type="button" data-icon="delete" aria-label="Usuń">delete</button>
-</div>
-</div>
-</div>
-</section>
-<!-- Right Column: Live Volume Tracker -->
-<section class="planner-layout__tracker">
-<div class="surface-card surface-card--medium surface-card--accent-secondary volume-tracker">
-<div class="panel-header">
-<h2 class="section-eyebrow">Live Volume Tracker</h2>
-<span class="material-symbols-outlined icon--filled volume-tracker__icon" data-icon="analytics">analytics</span>
-</div>
-<!-- Volume Bars -->
-<div class="volume-tracker__groups">
-<!-- Chest -->
-<div class="volume-tracker__group">
-<div class="volume-tracker__row">
-<span class="volume-tracker__label">Chest</span>
-<span class="volume-tracker__value">12 / 18 Sets</span>
-</div>
-<div class="progress-meter progress-meter--success">
-<div class="progress-meter__bar progress-meter__bar--success-gradient" style="width: 66%"></div>
-</div>
-</div>
-<!-- Back -->
-<div class="volume-tracker__group">
-<div class="volume-tracker__row">
-<span class="volume-tracker__label">Back</span>
-<span class="volume-tracker__value">8 / 18 Sets</span>
-</div>
-<div class="progress-meter progress-meter--success">
-<div class="progress-meter__bar progress-meter__bar--success-gradient" style="width: 44%"></div>
-</div>
-</div>
-<!-- Shoulders -->
-<div class="volume-tracker__group">
-<div class="volume-tracker__row">
-<span class="volume-tracker__label">Shoulders</span>
-<span class="volume-tracker__value">4 / 12 Sets</span>
-</div>
-<div class="progress-meter progress-meter--success">
-<div class="progress-meter__bar progress-meter__bar--success-gradient" style="width: 33%"></div>
-</div>
-</div>
-<!-- Biceps/Triceps Small -->
-<div class="volume-tracker__compact-grid">
-<div class="volume-tracker__compact">
-<span class="volume-tracker__compact-label">Biceps</span>
-<div class="progress-meter progress-meter--thin progress-meter--success">
-<div class="progress-meter__bar" style="width: 20%"></div>
-</div>
-</div>
-<div class="volume-tracker__compact">
-<span class="volume-tracker__compact-label">Triceps</span>
-<div class="progress-meter progress-meter--thin progress-meter--success">
-<div class="progress-meter__bar" style="width: 60%"></div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<!-- Secondary Insight Card -->
-<div class="surface-card surface-card--medium intensity-card">
-<h3 class="intensity-card__title">Est. Intensity</h3>
-<div class="intensity-card__row">
-<div class="intensity-card__score">8.4</div>
-<div class="intensity-scale">
-<div class="intensity-scale__fill" style="width: 84%"></div>
-<div class="intensity-scale__thumb" style="right: 16%"></div>
-</div>
-</div>
-<p class="intensity-card__note">Twoja obecna objętość jest optymalna dla adaptacji hipertroficznych w tym tygodniu.</p>
-</div>
-</section>
-</div>
-</main>
-<!-- Footer -->
-<footer class="site-footer site-footer--inline">
-<div class="site-footer__meta">
-            © 2026 Hipertrof.io. All rights reserved.
-        </div>
-<div class="site-footer__links">
-<a class="site-footer__link" href="#">Privacy</a>
-<a class="site-footer__link" href="#">Terms</a>
-<a class="site-footer__link" href="#">Support</a>
-</div>
-</footer>
-</body></html>
+    <main class="page-shell page-shell--planner">
+      <div class="planner-layout">
+        <section class="planner-layout__library">
+          <div class="surface-card surface-card--medium planner-library__search-card">
+            <span class="section-eyebrow">Gotowe i własne plany</span>
+            <h1 class="planner-panel-title">Wybierz plan</h1>
+            <?php if (!empty($plannerMessage)): ?>
+              <p class="planner-message"><?= $h($plannerMessage) ?></p>
+            <?php endif; ?>
+          </div>
+
+          <div class="planner-plan-list">
+            <?php foreach ($availablePlans as $plan): ?>
+              <?php $isActive = $isTruthy($plan['user_is_active'] ?? false); ?>
+              <article class="surface-card planner-plan-card <?= $isActive ? 'planner-plan-card--active' : '' ?>">
+                <div>
+                  <span class="section-eyebrow"><?= $isTruthy($plan['is_template'] ?? false) ? 'Szablon' : 'Plan użytkownika' ?></span>
+                  <h2 class="planner-plan-card__title"><?= $h($plan['name']) ?></h2>
+                  <p class="planner-plan-card__meta">
+                    <?= (int) ($plan['days_count'] ?? 0) ?> dni · <?= (int) ($plan['exercises_count'] ?? 0) ?> ćwiczeń
+                  </p>
+                </div>
+                <p class="planner-plan-card__description"><?= $h($plan['description'] ?? 'Brak opisu') ?></p>
+                <div class="planner-plan-card__footer">
+                  <span class="badge badge--<?= $isActive ? 'success' : 'neutral' ?>">
+                    <?= $isActive ? 'aktywny' : $h($goalLabels[$plan['goal']] ?? $plan['goal']) ?>
+                  </span>
+                  <?php if (!$isActive): ?>
+                    <form method="POST" action="/planer/activate">
+                      <input type="hidden" name="_csrf_token" value="<?= $h($csrfToken ?? '') ?>" />
+                      <input type="hidden" name="plan_id" value="<?= $h($plan['id']) ?>" />
+                      <button class="btn btn--subtle" type="submit">Ustaw</button>
+                    </form>
+                  <?php endif; ?>
+                </div>
+              </article>
+            <?php endforeach; ?>
+          </div>
+
+          <div class="surface-card surface-card--medium planner-add-card">
+            <span class="section-eyebrow">Dodaj ćwiczenie</span>
+            <form class="planner-add-form" method="POST" action="/planer/exercises/add">
+              <input type="hidden" name="_csrf_token" value="<?= $h($csrfToken ?? '') ?>" />
+              <label class="session-field">
+                <span class="set-control__label">Dzień planu</span>
+                <select class="session-select" name="day_order" required>
+                  <?php foreach ($planDays as $day): ?>
+                    <option value="<?= $h($day['day_order']) ?>"><?= $h($day['name']) ?></option>
+                  <?php endforeach; ?>
+                </select>
+              </label>
+
+              <label class="session-field">
+                <span class="set-control__label">Ćwiczenie</span>
+                <select class="session-select" name="exercise_id" required>
+                  <?php foreach ($exercises as $exercise): ?>
+                    <option value="<?= $h($exercise['id']) ?>">
+                      <?= $h($exercise['name']) ?> · <?= $h($exercise['primary_muscle_group'] ?? 'Ogólne') ?>
+                    </option>
+                  <?php endforeach; ?>
+                </select>
+              </label>
+
+              <div class="planner-add-form__grid">
+                <label class="session-field">
+                  <span class="set-control__label">Serie</span>
+                  <input class="session-number-field" type="number" name="target_sets" min="1" value="3" required />
+                </label>
+                <label class="session-field">
+                  <span class="set-control__label">Powt. od</span>
+                  <input class="session-number-field" type="number" name="target_reps_min" min="1" value="8" required />
+                </label>
+                <label class="session-field">
+                  <span class="set-control__label">Powt. do</span>
+                  <input class="session-number-field" type="number" name="target_reps_max" min="1" value="10" required />
+                </label>
+              </div>
+
+              <button class="btn btn--primary btn--full" type="submit" <?= empty($planDays) || empty($exercises) ? 'disabled' : '' ?>>
+                <span class="material-symbols-outlined">add</span>
+                Dodaj do planu
+              </button>
+              <?php if ($activePlan && !$canEditActivePlan): ?>
+                <p class="planner-hint">Najpierw utwórz prywatną kopię planu, żeby edytować szablon.</p>
+              <?php endif; ?>
+            </form>
+          </div>
+        </section>
+
+        <section class="planner-layout__board">
+          <div class="surface-card surface-card--board plan-board">
+            <div class="plan-board__header">
+              <div>
+                <span class="section-eyebrow">Aktywny plan</span>
+                <h1 class="plan-board__title">
+                  <?= $activePlan ? $h($activePlan['display_name']) : 'Brak aktywnego planu' ?>
+                </h1>
+                <p class="plan-board__subtitle">
+                  <?php if ($activePlan): ?>
+                    <?= $h($goalLabels[$activePlan['goal']] ?? $activePlan['goal']) ?> · <?= $h($levelLabels[$activePlan['level']] ?? $activePlan['level']) ?>
+                  <?php else: ?>
+                    Wybierz plan z listy po lewej albo utwórz własny od zera.
+                  <?php endif; ?>
+                </p>
+              </div>
+              <div class="plan-board__actions">
+                <a class="plan-board__action plan-board__action--secondary" href="/atlas" aria-label="Otwórz atlas ćwiczeń">
+                  <span class="material-symbols-outlined">fitness_center</span>
+                  <span>Atlas</span>
+                </a>
+                <a class="plan-board__action plan-board__action--primary" href="/session" aria-label="Rozpocznij trening">
+                  <span class="material-symbols-outlined">play_arrow</span>
+                  <span>Start</span>
+                </a>
+              </div>
+            </div>
+
+            <?php if ($activePlan): ?>
+              <div class="planner-management">
+                <?php if ($canEditActivePlan): ?>
+                  <?php if ($isEditingActivePlan): ?>
+                    <a class="planner-management__button planner-management__button--subtle" href="/planer">Anuluj</a>
+                  <?php else: ?>
+                    <a class="planner-management__button planner-management__button--subtle" href="/planer?edit=1">Edytuj</a>
+                  <?php endif; ?>
+                  <form method="POST" action="/planer/delete" data-confirm="Usunąć ten plan? Tej operacji nie da się cofnąć.">
+                    <input type="hidden" name="_csrf_token" value="<?= $h($csrfToken ?? '') ?>" />
+                    <input type="hidden" name="plan_id" value="<?= $h($activePlan['id']) ?>" />
+                    <button class="planner-management__button planner-management__button--danger" type="submit">Usuń plan</button>
+                  </form>
+                <?php else: ?>
+                  <form method="POST" action="/planer/edit">
+                    <input type="hidden" name="_csrf_token" value="<?= $h($csrfToken ?? '') ?>" />
+                    <button class="planner-management__button planner-management__button--subtle" type="submit">Edytuj</button>
+                  </form>
+                <?php endif; ?>
+              </div>
+            <?php endif; ?>
+
+            <?php if ($activePlan && !$canEditActivePlan): ?>
+              <div class="planner-edit-copy">
+                <span>To gotowy szablon. Utwórz prywatną kopię, żeby zmieniać kolejność i parametry ćwiczeń.</span>
+              </div>
+            <?php endif; ?>
+
+            <?php if ($isEditingActivePlan): ?>
+              <form id="planner-bulk-edit-form" method="POST" action="/planer/exercises/update">
+                <input type="hidden" name="_csrf_token" value="<?= $h($csrfToken ?? '') ?>" />
+              </form>
+            <?php endif; ?>
+
+            <div class="workout-slots">
+              <?php if (empty($planDays)): ?>
+                <div class="drop-zone">
+                  <span class="material-symbols-outlined drop-zone__icon">event_busy</span>
+                  <p class="drop-zone__text">Ten plan nie ma jeszcze dni treningowych.</p>
+                </div>
+              <?php else: ?>
+                <?php foreach ($planDays as $day): ?>
+                  <?php $dayExercises = $planExercises[(int) $day['day_order']] ?? []; ?>
+                  <section class="planner-day">
+                    <div class="planner-day__header">
+                      <div>
+                        <h2 class="planner-day__title"><?= $h($day['name']) ?></h2>
+                        <p class="planner-day__meta">
+                          <?= count($dayExercises) ?> ćwiczeń
+                          <?php if (!empty($day['notes'])): ?>
+                            · <?= $h($day['notes']) ?>
+                          <?php endif; ?>
+                        </p>
+                      </div>
+                      <span class="badge badge--neutral">Dzień <?= (int) $day['day_order'] ?></span>
+                    </div>
+
+                    <?php if (empty($dayExercises)): ?>
+                      <div class="drop-zone">
+                        <span class="material-symbols-outlined drop-zone__icon">add_circle</span>
+                        <p class="drop-zone__text">Dodaj ćwiczenie formularzem po lewej.</p>
+                      </div>
+                    <?php else: ?>
+                      <?php foreach ($dayExercises as $exercise): ?>
+                        <div class="workout-slot <?= $isEditingActivePlan ? 'workout-slot--editing' : 'workout-slot--readonly' ?>">
+                          <div class="workout-slot__order">
+                            <?php if ($isEditingActivePlan): ?>
+                              <form method="POST" action="/planer/exercises/move">
+                                <input type="hidden" name="_csrf_token" value="<?= $h($csrfToken ?? '') ?>" />
+                                <input type="hidden" name="plan_exercise_id" value="<?= $h($exercise['id']) ?>" />
+                                <input type="hidden" name="direction" value="up" />
+                                <button class="workout-slot__order-button" type="submit" aria-label="Przesuń ćwiczenie wyżej">
+                                  <span class="material-symbols-outlined">keyboard_arrow_up</span>
+                                </button>
+                              </form>
+                            <?php endif; ?>
+                            <span class="workout-slot__number"><?= (int) $exercise['exercise_order'] ?></span>
+                            <?php if ($isEditingActivePlan): ?>
+                              <form method="POST" action="/planer/exercises/move">
+                                <input type="hidden" name="_csrf_token" value="<?= $h($csrfToken ?? '') ?>" />
+                                <input type="hidden" name="plan_exercise_id" value="<?= $h($exercise['id']) ?>" />
+                                <input type="hidden" name="direction" value="down" />
+                                <button class="workout-slot__order-button" type="submit" aria-label="Przesuń ćwiczenie niżej">
+                                  <span class="material-symbols-outlined">keyboard_arrow_down</span>
+                                </button>
+                              </form>
+                            <?php endif; ?>
+                          </div>
+
+                          <div class="workout-slot__content">
+                            <div class="workout-slot__header">
+                              <h3 class="workout-slot__title"><?= $h($exercise['exercise_name']) ?></h3>
+                              <span class="badge badge--primary"><?= $h($exercise['muscle_groups'] ?: 'Ogólne') ?></span>
+                            </div>
+                            <?php if ($isEditingActivePlan): ?>
+                              <input type="hidden" form="planner-bulk-edit-form" name="exercise_ids[]" value="<?= $h($exercise['id']) ?>" />
+                              <div class="workout-slot__edit-grid">
+                                <label class="workout-slot__field">
+                                  <span>Serie</span>
+                                  <input form="planner-bulk-edit-form" type="number" name="target_sets[<?= $h($exercise['id']) ?>]" min="1" value="<?= (int) $exercise['target_sets'] ?>" required />
+                                </label>
+                                <label class="workout-slot__field">
+                                  <span>Powt. od</span>
+                                  <input form="planner-bulk-edit-form" type="number" name="target_reps_min[<?= $h($exercise['id']) ?>]" min="1" value="<?= $h($exercise['target_reps_min']) ?>" required />
+                                </label>
+                                <label class="workout-slot__field">
+                                  <span>Powt. do</span>
+                                  <input form="planner-bulk-edit-form" type="number" name="target_reps_max[<?= $h($exercise['id']) ?>]" min="1" value="<?= $h($exercise['target_reps_max']) ?>" required />
+                                </label>
+                              </div>
+                            <?php else: ?>
+                              <div class="workout-slot__summary">
+                                <span class="workout-slot__summary-pill">Serie: <?= (int) $exercise['target_sets'] ?></span>
+                                <span class="workout-slot__summary-pill">Powt.: <?= $h($formatReps($exercise['target_reps_min'], $exercise['target_reps_max'])) ?></span>
+                                <span class="workout-slot__readonly"><?= (int) $exercise['target_sets'] ?> x <?= $h($formatReps($exercise['target_reps_min'], $exercise['target_reps_max'])) ?></span>
+                              </div>
+                            <?php endif; ?>
+                          </div>
+
+                          <?php if ($isEditingActivePlan): ?>
+                            <form method="POST" action="/planer/exercises/delete" data-confirm="Usunąć to ćwiczenie z aktywnego planu?">
+                              <input type="hidden" name="_csrf_token" value="<?= $h($csrfToken ?? '') ?>" />
+                              <input type="hidden" name="plan_exercise_id" value="<?= $h($exercise['id']) ?>" />
+                              <button class="workout-slot__delete" type="submit" aria-label="Usuń ćwiczenie">
+                                <span class="material-symbols-outlined">delete</span>
+                              </button>
+                            </form>
+                          <?php endif; ?>
+                        </div>
+                      <?php endforeach; ?>
+                    <?php endif; ?>
+                  </section>
+                <?php endforeach; ?>
+              <?php endif; ?>
+            </div>
+
+            <?php if ($isEditingActivePlan && !empty($planDays)): ?>
+              <div class="planner-bulk-actions">
+                <button class="btn btn--primary planner-bulk-actions__save" type="submit" form="planner-bulk-edit-form">
+                  <span class="material-symbols-outlined">check</span>
+                  Zapisz zmiany
+                </button>
+              </div>
+            <?php endif; ?>
+          </div>
+        </section>
+
+        <section class="planner-layout__tracker">
+          <div class="surface-card surface-card--medium surface-card--accent-secondary volume-tracker">
+            <div class="panel-header">
+              <div>
+                <span class="section-eyebrow">Objętość planu</span>
+                <h2 class="planner-panel-title"><?= (int) $totalSets ?> serii / tydzień</h2>
+              </div>
+              <span class="material-symbols-outlined icon--filled volume-tracker__icon">analytics</span>
+            </div>
+
+            <div class="volume-tracker__groups">
+              <?php if (empty($muscleVolume)): ?>
+                <p class="planner-hint">Dodaj ćwiczenia, żeby zobaczyć rozkład objętości na partie.</p>
+              <?php else: ?>
+                <?php foreach ($muscleVolume as $row): ?>
+                  <?php
+                    $setsCount = (int) ($row['sets_count'] ?? 0);
+                    $percent = min(100, (int) round(($setsCount / $maxSets) * 100));
+                  ?>
+                  <div class="volume-tracker__group">
+                    <div class="volume-tracker__row">
+                      <span class="volume-tracker__label"><?= $h($row['muscle_group']) ?></span>
+                      <span class="volume-tracker__value"><?= $setsCount ?> serii</span>
+                    </div>
+                    <div class="progress-meter progress-meter--success">
+                      <div class="progress-meter__bar progress-meter__bar--success-gradient" style="width: <?= $percent ?>%"></div>
+                    </div>
+                  </div>
+                <?php endforeach; ?>
+              <?php endif; ?>
+            </div>
+          </div>
+
+          <div class="surface-card surface-card--medium planner-create-card">
+            <span class="section-eyebrow">Plan od zera</span>
+            <h2 class="planner-panel-title">Utwórz własny plan</h2>
+            <form class="planner-create-form" method="POST" action="/planer/create">
+              <input type="hidden" name="_csrf_token" value="<?= $h($csrfToken ?? '') ?>" />
+              <label class="session-field">
+                <span class="set-control__label">Nazwa planu</span>
+                <input class="session-text-field" type="text" name="name" maxlength="120" placeholder="np. FBW 3 dni" required />
+              </label>
+              <label class="session-field">
+                <span class="set-control__label">Liczba dni</span>
+                <input class="session-number-field" type="number" name="days_count" min="1" max="7" value="3" required />
+              </label>
+              <div class="planner-day-name-grid">
+                <?php for ($dayIndex = 1; $dayIndex <= 7; $dayIndex++): ?>
+                  <label class="session-field">
+                    <span class="set-control__label">Dzień <?= $dayIndex ?></span>
+                    <input class="session-text-field" type="text" name="day_names[]" maxlength="120" placeholder="np. FBW <?= chr(64 + $dayIndex) ?>" />
+                  </label>
+                <?php endfor; ?>
+              </div>
+              <button class="btn btn--primary btn--full" type="submit">
+                <span class="material-symbols-outlined">add</span>
+                Utwórz plan
+              </button>
+            </form>
+          </div>
+
+          <div class="surface-card surface-card--medium intensity-card">
+            <h3 class="intensity-card__title">Status edycji</h3>
+            <div class="intensity-card__row">
+              <div class="intensity-card__score"><?= $canEditActivePlan ? 'OK' : 'Kopia' ?></div>
+              <div class="intensity-scale">
+                <div class="intensity-scale__fill" style="width: <?= $canEditActivePlan ? '100' : '55' ?>%"></div>
+                <div class="intensity-scale__thumb" style="right: <?= $canEditActivePlan ? '0' : '45' ?>%"></div>
+              </div>
+            </div>
+            <p class="intensity-card__note">
+              <?= $canEditActivePlan
+                  ? 'Edytujesz własny plan użytkownika.'
+                  : 'Aktywny plan jest szablonem. Utwórz kopię, żeby go modyfikować.'
+              ?>
+            </p>
+          </div>
+        </section>
+      </div>
+    </main>
+
+  </body>
+</html>

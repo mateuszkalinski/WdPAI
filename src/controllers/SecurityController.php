@@ -1,15 +1,15 @@
 <?php
 
 require_once 'AppController.php';
-require_once __DIR__.'/../repositories/UsersRepository.php';
+require_once __DIR__.'/../services/AuthService.php';
 
 class SecurityController extends AppController
 {
-    private UsersRepository $userRepository;
+    private AuthService $authService;
 
     public function __construct()
     {
-        $this->userRepository = new UsersRepository();
+        $this->authService = new AuthService();
     }
 
     public function login(): void
@@ -23,37 +23,16 @@ class SecurityController extends AppController
             return;
         }
 
-        $email = trim($_POST["email"] ?? '');
-        $password = $_POST["password"] ?? '';
-        $invalidMessage = 'E-mail lub haslo nieprawidlowe';
+        $this->requireCsrf();
 
-        if (empty($email) || empty($password)) {
-            $this->render('login', ['messages' => $invalidMessage]);
+        $result = $this->authService->login($_POST, $_SESSION, $_SERVER);
+
+        if (!$result['success']) {
+            http_response_code($result['status']);
+            $this->render('login', ['messages' => $result['message']]);
             return;
         }
 
-        $user = $this->userRepository->getUserByEmail($email);
-
-        if (!$user || !password_verify($password, $user['password'])) {
-            $this->render('login', ['messages' => $invalidMessage]);
-            return;
-        }
-
-        if (!$user['is_active']) {
-            $this->render('login', ['messages' => 'Konto zostalo zablokowane']);
-            return;
-        }
-
-        session_regenerate_id(true);
-
-        $_SESSION['user_id'] = (int) $user['id'];
-        $_SESSION['user_email'] = $user['email'];
-        $_SESSION['username'] = $user['username'];
-        $_SESSION['role'] = $user['role'];
-        $_SESSION['firstname'] = $user['firstname'] ?? '';
-        $_SESSION['lastname'] = $user['lastname'] ?? '';
-
-        $this->userRepository->updateLastLogin((int) $user['id']);
         $this->redirect('/dashboard');
     }
 
@@ -68,45 +47,15 @@ class SecurityController extends AppController
             return;
         }
 
-        $email = trim($_POST['email'] ?? '');
-        $password = $_POST['password'] ?? '';
-        $password2 = $_POST['password2'] ?? '';
-        $username = trim($_POST['username'] ?? '');
-        $firstname = trim($_POST['firstName'] ?? '');
-        $lastname = trim($_POST['lastName'] ?? '');
+        $this->requireCsrf();
 
-        if (empty($email) || empty($password) || empty($password2) || empty($username) || empty($firstname) || empty($lastname)) {
-            $this->render('register', ['messages' => 'Wypelnij wszystkie pola']);
+        $result = $this->authService->register($_POST);
+
+        if (!$result['success']) {
+            http_response_code($result['status']);
+            $this->render('register', ['messages' => $result['message']]);
             return;
         }
-
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $this->render('register', ['messages' => 'Podaj poprawny adres e-mail']);
-            return;
-        }
-
-        if ($password !== $password2) {
-            $this->render('register', ['messages' => 'Hasla sie nie zgadzaja']);
-            return;
-        }
-
-        if (strlen($password) < 6) {
-            $this->render('register', ['messages' => 'Haslo musi miec minimum 6 znakow']);
-            return;
-        }
-
-        if ($this->userRepository->getUserByEmail($email)) {
-            $this->render('register', ['messages' => 'Konto z podanym e-mailem juz istnieje']);
-            return;
-        }
-
-        if ($this->userRepository->getUserByUsername($username)) {
-            $this->render('register', ['messages' => 'Nazwa uzytkownika jest juz zajeta']);
-            return;
-        }
-
-        $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
-        $this->userRepository->createUser($username, $email, $hashedPassword, $firstname, $lastname);
 
         $this->redirect('/login');
     }

@@ -3,8 +3,10 @@ const exerciseGrid = document.querySelector("[data-exercise-grid]");
 const emptyState = document.querySelector("[data-empty-state]");
 const resultsCount = document.querySelector("[data-results-count]");
 const filterContainer = document.querySelector("[data-muscle-filters]");
+const filterScrollButtons = document.querySelectorAll("[data-filter-scroll]");
 
 if (searchInput && exerciseGrid && emptyState && resultsCount && filterContainer) {
+  const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || "";
   const difficultyLabels = {
     beginner: "Początkujący",
     intermediate: "Średni",
@@ -14,6 +16,7 @@ if (searchInput && exerciseGrid && emptyState && resultsCount && filterContainer
   let activeMuscleGroupId = "";
   let debounceTimer = null;
   let requestNumber = 0;
+  let currentRequestController = null;
 
   const escapeHtml = (value) =>
     String(value ?? "")
@@ -59,27 +62,37 @@ if (searchInput && exerciseGrid && emptyState && resultsCount && filterContainer
 
   const searchExercises = async () => {
     const currentRequest = ++requestNumber;
+    currentRequestController?.abort();
+    currentRequestController = new AbortController();
 
-    const response = await fetch("/api/exercises/search", {
-      method: "POST",
-      credentials: "same-origin",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        search: searchInput.value.trim(),
-        muscleGroupId: activeMuscleGroupId || null,
-      }),
-    });
+    try {
+      const response = await fetch("/api/exercises/search", {
+        method: "POST",
+        credentials: "same-origin",
+        signal: currentRequestController.signal,
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRF-Token": csrfToken,
+        },
+        body: JSON.stringify({
+          search: searchInput.value.trim(),
+          muscleGroupId: activeMuscleGroupId || null,
+        }),
+      });
 
-    if (!response.ok) {
-      return;
-    }
+      if (!response.ok) {
+        return;
+      }
 
-    const data = await response.json();
+      const data = await response.json();
 
-    if (currentRequest === requestNumber) {
-      renderExercises(data.exercises || []);
+      if (currentRequest === requestNumber) {
+        renderExercises(data.exercises || []);
+      }
+    } catch (error) {
+      if (error.name !== "AbortError") {
+        throw error;
+      }
     }
   };
 
@@ -104,5 +117,17 @@ if (searchInput && exerciseGrid && emptyState && resultsCount && filterContainer
     button.classList.add("filter-chip--active");
     activeMuscleGroupId = button.dataset.muscleId || "";
     scheduleSearch();
+  });
+
+  filterScrollButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const direction = Number(button.dataset.filterScroll || 1);
+      const distance = Math.max(220, Math.floor(filterContainer.clientWidth * 0.75));
+
+      filterContainer.scrollBy({
+        left: direction * distance,
+        behavior: "smooth",
+      });
+    });
   });
 }

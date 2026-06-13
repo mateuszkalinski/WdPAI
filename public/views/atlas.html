@@ -11,7 +11,7 @@
 <html lang="pl">
   <head>
     <?php include __DIR__ . '/partials/head.html'; ?>
-    <title>Atlas ćwiczeń</title>
+    <title>Atlas ćwiczeń | Hipertrof.io</title>
     <script src="/public/scripts/atlas.js" defer></script>
   </head>
   <body class="app-body">
@@ -37,13 +37,17 @@
           />
         </div>
 
-        <div class="filter-list" data-muscle-filters>
-          <button class="filter-chip filter-chip--active" type="button" data-muscle-id="">Wszystkie</button>
-          <?php foreach (($muscleGroups ?? []) as $group): ?>
-            <button class="filter-chip" type="button" data-muscle-id="<?= $h($group['id']) ?>">
-              <?= $h($group['name']) ?>
-            </button>
-          <?php endforeach; ?>
+        <div class="filter-strip" data-filter-strip>
+          <button class="filter-strip__button material-symbols-outlined" type="button" data-filter-scroll="-1" aria-label="Poprzednie partie">chevron_left</button>
+          <div class="filter-list" data-muscle-filters>
+            <button class="filter-chip filter-chip--active" type="button" data-muscle-id="">Wszystkie</button>
+            <?php foreach (($muscleGroups ?? []) as $group): ?>
+              <button class="filter-chip" type="button" data-muscle-id="<?= $h($group['id']) ?>">
+                <?= $h($group['name']) ?>
+              </button>
+            <?php endforeach; ?>
+          </div>
+          <button class="filter-strip__button material-symbols-outlined" type="button" data-filter-scroll="1" aria-label="Następne partie">chevron_right</button>
         </div>
       </section>
 

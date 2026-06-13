@@ -32,6 +32,38 @@ class Routing
             "controller" => "DashboardController",
             "action" => "planer"
         ],
+        "planer/activate" => [
+            "controller" => "DashboardController",
+            "action" => "activatePlan"
+        ],
+        "planer/create" => [
+            "controller" => "DashboardController",
+            "action" => "createPlan"
+        ],
+        "planer/edit" => [
+            "controller" => "DashboardController",
+            "action" => "editActivePlan"
+        ],
+        "planer/delete" => [
+            "controller" => "DashboardController",
+            "action" => "deletePlan"
+        ],
+        "planer/exercises/add" => [
+            "controller" => "DashboardController",
+            "action" => "addPlanExercise"
+        ],
+        "planer/exercises/update" => [
+            "controller" => "DashboardController",
+            "action" => "updatePlanExercise"
+        ],
+        "planer/exercises/move" => [
+            "controller" => "DashboardController",
+            "action" => "movePlanExercise"
+        ],
+        "planer/exercises/delete" => [
+            "controller" => "DashboardController",
+            "action" => "deletePlanExercise"
+        ],
         "session" => [
             "controller" => "DashboardController",
             "action" => "session"
@@ -104,6 +136,10 @@ class Routing
             "controller" => "ApiController",
             "action" => "addWorkoutSet"
         ],
+        "api/workout/skip" => [
+            "controller" => "ApiController",
+            "action" => "skipWorkoutPlanItem"
+        ],
         "api/workout/finish" => [
             "controller" => "ApiController",
             "action" => "finishWorkoutSession"
@@ -118,10 +154,15 @@ class Routing
             return;
         }
 
-        $controller = self::$routes[$path]["controller"];
-        $action = self::$routes[$path]["action"];
+        try {
+            $controller = self::$routes[$path]["controller"];
+            $action = self::$routes[$path]["action"];
 
-        $controllerObj = new $controller;
-        $controllerObj->$action();
+            $controllerObj = new $controller;
+            $controllerObj->$action();
+        } catch (Throwable) {
+            http_response_code(500);
+            include 'public/views/500.html';
+        }
     }
 }

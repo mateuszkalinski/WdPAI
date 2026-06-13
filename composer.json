@@ -1,0 +1,11 @@
+{
+  "name": "wdpai/hipertrof-io",
+  "description": "MVC training diary project for WdPAI.",
+  "type": "project",
+  "require-dev": {
+    "phpunit/phpunit": "^10.5"
+  },
+  "scripts": {
+    "test": "phpunit"
+  }
+}

@@ -4,7 +4,7 @@
 <html lang="pl">
   <head>
     <?php include __DIR__ . '/partials/head.html'; ?>
-    <title>Admin - odznaki</title>
+    <title>Admin - odznaki | Hipertrof.io</title>
   </head>
   <body class="app-body">
     <?php include __DIR__ . '/partials/nav.html'; ?>
@@ -27,6 +27,7 @@
 
       <section class="admin-grid">
         <form class="surface-card surface-card--large admin-form" method="POST" action="/admin/badges/create">
+          <input type="hidden" name="_csrf_token" value="<?= $h($csrfToken ?? '') ?>">
           <div class="panel-header panel-header--wide">
             <h2 class="panel-header__title">Nowa odznaka</h2>
             <span class="material-symbols-outlined icon--filled">workspace_premium</span>
@@ -133,11 +134,13 @@
                     <td>
                       <?php if ($badge['is_active']): ?>
                         <form method="POST" action="/admin/badges/deactivate">
+                          <input type="hidden" name="_csrf_token" value="<?= $h($csrfToken ?? '') ?>">
                           <input type="hidden" name="id" value="<?= $h($badge['id']) ?>">
                           <button class="icon-button icon-button--soft material-symbols-outlined" type="submit" aria-label="Ukryj">visibility_off</button>
                         </form>
                       <?php else: ?>
                         <form method="POST" action="/admin/badges/activate">
+                          <input type="hidden" name="_csrf_token" value="<?= $h($csrfToken ?? '') ?>">
                           <input type="hidden" name="id" value="<?= $h($badge['id']) ?>">
                           <button class="icon-button icon-button--soft material-symbols-outlined" type="submit" aria-label="Aktywuj">visibility</button>
                         </form>
